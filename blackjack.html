@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="True Count: a free, interactive course on Hi-Lo card counting in blackjack.">
+<style>:root{color-scheme:light; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<title>True Count</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: same course book as Outs & Odds. Contents on the left, one lesson at a time, felt boxes for dealt cards. */
+:root{
+  --bg:#f3f3f0; --paper:#ffffff; --line:#d6d7d2; --line-2:#e6e7e3; --ink:#141614; --muted:#5f625d;
+  --felt:#0e5a3d; --felt-ink:#eef5f1; --felt-muted:#9fc4b2;
+  --red:#b8132e; --red-ink:#ffffff; --red-soft:#f8e3e6;
+  --good:#17784a; --good-soft:#e1f1e8; --bad:#b8132e; --bad-soft:#f8e3e6; --warn:#8a5d00; --warn-soft:#f6ecd4;
+  --card:#fcfcfa; --card-line:#cfd1cc;
+  --s:#161616; --h:#c41a2c; --d:#1d5fbf; --c:#16823a;
+  --f-head:"Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111312; --paper:#181b19; --line:#2c312e; --line-2:#222724; --ink:#e7eae6; --muted:#979d98;
+  --felt:#0d4a33; --felt-ink:#e8f2ec; --felt-muted:#8db7a2;
+  --red:#e0485d; --red-ink:#1a0306; --red-soft:#35161b;
+  --good:#4cc488; --good-soft:#15291f; --bad:#ef6b7c; --bad-soft:#35161b; --warn:#e8b450; --warn-soft:#2f2611;
+  --card:#f1f1ec; --card-line:#c5c7c1; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#111312; --paper:#181b19; --line:#2c312e; --line-2:#222724; --ink:#e7eae6; --muted:#979d98;
+  --felt:#0d4a33; --felt-ink:#e8f2ec; --felt-muted:#8db7a2;
+  --red:#e0485d; --red-ink:#1a0306; --red-soft:#35161b;
+  --good:#4cc488; --good-soft:#15291f; --bad:#ef6b7c; --bad-soft:#35161b; --warn:#e8b450; --warn-soft:#2f2611;
+  --card:#f1f1ec; --card-line:#c5c7c1; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 56px}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--red); outline-offset:2px}
+a{color:inherit}
+
+.mast{max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;
+  padding-block:22px 18px; border-bottom:2px solid var(--ink)}
+.mast h1{font-family:var(--f-head); font-stretch:118%; font-weight:850; font-size:1.65rem; line-height:1; margin:0; letter-spacing:-.01em}
+.mast h1 span{color:var(--red)}
+.mast p{margin:0; color:var(--muted); font-size:.9rem}
+
+.wrap{max-width:1100px; margin:0 auto; display:grid; grid-template-columns:230px minmax(0,1fr); gap:48px; padding-top:28px}
+@media (max-width:860px){ .wrap{grid-template-columns:minmax(0,1fr); gap:20px; padding-top:16px} }
+
+/* contents */
+.toc{position:sticky; top:20px; align-self:start}
+.toc h2{font-family:var(--f-head); font-stretch:110%; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; font-weight:700}
+.toc ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column}
+.toc a{display:grid; grid-template-columns:26px 1fr; gap:4px; padding:7px 0; text-decoration:none; color:var(--muted); font-size:.92rem; border-top:1px solid var(--line-2)}
+.toc a .no{font-family:var(--f-mono); font-size:.8rem; padding-top:2px}
+.toc a:hover{color:var(--ink)}
+.toc a[aria-current="page"]{color:var(--ink); font-weight:600}
+.toc a[aria-current="page"] .no{color:var(--red)}
+.toc a.done .no::after{content:" ✓"; color:var(--good)}
+@media (max-width:860px){
+  .toc{position:static}
+  .toc ol{flex-direction:row; overflow-x:auto; gap:6px; padding-bottom:6px; scrollbar-width:thin}
+  .toc li{flex:none}
+  .toc a{display:flex; border:1px solid var(--line); background:var(--paper); padding:6px 10px; border-radius:3px; white-space:nowrap}
+  .toc a[aria-current="page"]{border-color:var(--ink)}
+}
+
+/* lesson */
+.lesson{max-width:720px; display:flex; flex-direction:column; gap:22px; min-width:0}
+.kicker{font-family:var(--f-mono); font-size:.8rem; color:var(--red); margin:0}
+.lesson h2{font-family:var(--f-head); font-stretch:112%; font-weight:800; font-size:clamp(1.7rem, 4vw, 2.35rem); line-height:1.08; margin:-12px 0 0; text-wrap:balance; letter-spacing:-.015em}
+.lesson h3{font-family:var(--f-head); font-stretch:105%; font-weight:700; font-size:1.15rem; margin:0}
+.lesson p{margin:0; max-width:64ch}
+.lead{font-size:1.1rem; color:var(--ink)}
+.muted{color:var(--muted)}
+.stack{display:flex; flex-direction:column; gap:12px}
+strong{font-weight:600}
+.n{font-family:var(--f-mono); font-variant-numeric:tabular-nums; font-size:.92em}
+
+.note{border-top:2px solid var(--ink); padding-top:12px; display:flex; flex-direction:column; gap:6px}
+.note b{font-family:var(--f-head); font-stretch:110%; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase}
+
+/* felt */
+.felt{background:var(--felt); color:var(--felt-ink); border-radius:4px; padding:18px 20px; display:flex; gap:28px; flex-wrap:wrap; align-items:flex-end}
+.felt .grp{display:flex; flex-direction:column; gap:8px}
+.lbl{font-family:var(--f-head); font-stretch:110%; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--felt-muted); font-weight:700}
+.cards{display:flex; gap:7px}
+.potline{margin-left:auto; font-family:var(--f-mono); font-size:.9rem; text-align:right; display:flex; flex-direction:column; gap:2px}
+.potline b{font-weight:600; color:#fff}
+@media (max-width:520px){ .potline{margin-left:0; text-align:left} .felt{gap:18px} }
+
+/* playing card: corner index + center pip */
+.card{width:56px; height:80px; border-radius:6px; position:relative; flex:none}
+.card-in{position:absolute; inset:0; transform-style:preserve-3d}
+.face{position:absolute; inset:0; border-radius:6px; -webkit-backface-visibility:hidden; backface-visibility:hidden}
+.front{background:var(--card); border:1px solid var(--card-line); box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.back{transform:rotateY(180deg); border:3px solid #f4f4ef; box-shadow:0 1px 0 rgba(0,0,0,.25);
+  background:repeating-linear-gradient(45deg, #a3122a 0 4px, #8a0f22 4px 8px)}
+.card .ix{position:absolute; top:5px; left:6px; display:flex; flex-direction:column; align-items:center; line-height:.95}
+.card .ix i{font-style:normal; font-family:var(--f-head); font-stretch:90%; font-weight:800; font-size:1.05rem}
+.card .ix u{text-decoration:none; font-size:.8rem}
+.card .pip{position:absolute; right:7px; bottom:4px; font-size:1.75rem; line-height:1}
+.card.slot{background:transparent; border:1px dashed rgba(255,255,255,.25); box-shadow:none}
+
+/* sliders */
+.sl{display:flex; flex-direction:column; gap:4px}
+.sl-head{display:flex; justify-content:space-between; align-items:center; gap:12px}
+.sl-head label{font-weight:600; font-size:.92rem}
+.stepper{display:inline-flex; align-items:stretch; border:1px solid var(--line); border-radius:3px; overflow:hidden; background:var(--paper)}
+.stepper button{width:34px; border:0; background:transparent; font-size:1.05rem; line-height:1; color:var(--muted); transition:background-color .15s, color .15s}
+.stepper button:hover{background:var(--line-2); color:var(--ink)}
+.stepper button:active{background:var(--line)}
+.stepper output{min-width:66px; text-align:center; font:600 1rem/34px var(--f-mono); padding:0 8px; border-inline:1px solid var(--line); font-variant-numeric:tabular-nums}
+.sl-track{position:relative; padding-bottom:18px}
+.rng{-webkit-appearance:none; appearance:none; display:block; width:100%; height:30px; background:transparent; margin:0; --p:50%; cursor:pointer}
+.rng::-webkit-slider-runnable-track{height:6px; border-radius:3px; background:linear-gradient(to right, var(--red) 0 var(--p), var(--line) var(--p) 100%)}
+.rng::-moz-range-track{height:6px; border-radius:3px; background:var(--line)}
+.rng::-moz-range-progress{height:6px; border-radius:3px; background:var(--red)}
+.rng::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px; margin-top:-8px; border-radius:50%; background:var(--paper); border:2px solid var(--red);
+  box-shadow:0 1px 4px rgba(0,0,0,.28); transition:transform .15s var(--ease-spring), box-shadow .15s}
+.rng::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--paper); border:2px solid var(--red); box-shadow:0 1px 4px rgba(0,0,0,.28); transition:transform .15s var(--ease-spring), box-shadow .15s}
+.rng:hover::-webkit-slider-thumb{transform:scale(1.1)}
+.rng:hover::-moz-range-thumb{transform:scale(1.1)}
+.rng:active::-webkit-slider-thumb{transform:scale(1.2); box-shadow:0 0 0 7px var(--red-soft)}
+.rng:active::-moz-range-thumb{transform:scale(1.2); box-shadow:0 0 0 7px var(--red-soft)}
+.rng:focus{outline:none}
+.rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--red)}
+.rng:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--red)}
+.ticks{position:absolute; left:0; right:0; bottom:0; height:14px}
+.ticks span{position:absolute; left:calc(var(--t) * (100% - 22px) + 11px); transform:translateX(-50%); font:500 .68rem var(--f-mono); color:var(--muted); white-space:nowrap}
+.ticks span::before{content:""; position:absolute; left:50%; top:-5px; width:1px; height:4px; background:var(--line)}
+
+/* rule vs exact bars */
+.cmp{display:flex; flex-direction:column; gap:10px}
+.cmp-row{display:grid; grid-template-columns:78px minmax(0,1fr) 66px; gap:12px; align-items:center}
+.cmp-k{font-size:.85rem; color:var(--muted)}
+.cmp-row b{font-family:var(--f-head); font-weight:800; font-size:1.2rem; text-align:right; font-variant-numeric:tabular-nums}
+.trk{height:16px; background:var(--line-2); border-radius:2px; position:relative; overflow:hidden}
+.trk::after{content:""; position:absolute; inset:0; background:linear-gradient(to right, transparent calc(25% - 1px), var(--line) 0 25%, transparent 0 calc(50% - 1px), var(--line) 0 50%, transparent 0 calc(75% - 1px), var(--line) 0 75%, transparent 0); pointer-events:none}
+.fill{position:absolute; top:0; bottom:0; left:0; background:var(--muted); transition:width .35s var(--ease-out); z-index:1}
+.fill.ex{background:var(--red)}
+.axis-t{position:relative; height:14px; font:500 .68rem var(--f-mono); color:var(--muted)}
+.axis-t span{position:absolute; transform:translateX(-50%)}
+.cmp-sum{font-size:.9rem; color:var(--muted)}
+.cmp-sum b{color:var(--ink); font-family:var(--f-mono); font-weight:600}
+@media (max-width:420px){ .cmp-row{grid-template-columns:62px minmax(0,1fr) 56px; gap:8px} }
+
+/* home */
+.home-link{text-decoration:none}
+.home-h{font-size:clamp(2.1rem, 6vw, 3.4rem) !important; max-width:16ch}
+.home-ex{display:flex; flex-direction:column; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:var(--paper)}
+.home-ex .felt{border-radius:0}
+.method{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); border-bottom:1px solid var(--line)}
+.method li{padding:14px 16px; display:flex; flex-direction:column; gap:4px; border-right:1px solid var(--line); counter-increment:m}
+.method li:last-child{border-right:0}
+.method li b::before{content:counter(m) ". "; color:var(--red); font-family:var(--f-mono)}
+.method li b{font-size:.92rem}
+.method li span{font-size:.85rem; color:var(--muted)}
+.method li em{font-style:normal; font-family:var(--f-head); font-weight:800; font-size:1.35rem; margin-top:auto}
+.method-v{padding:12px 16px; font-size:.92rem}
+@media (max-width:620px){ .method{grid-template-columns:minmax(0,1fr)} .method li{border-right:0; border-bottom:1px solid var(--line)} .method li:last-child{border-bottom:0} }
+.home-list{list-style:none; margin:0; padding:0}
+.home-list a{display:grid; grid-template-columns:28px 1fr; gap:6px; padding:12px 0; border-top:1px solid var(--line-2); text-decoration:none}
+.home-list a .no{font-family:var(--f-mono); color:var(--red); font-size:.85rem; padding-top:2px}
+.home-list a span:last-child{display:flex; flex-direction:column}
+.home-list a small{color:var(--muted); font-size:.88rem}
+.home-list a:hover strong{text-decoration:underline; text-underline-offset:3px}
+a.btn{text-decoration:none; display:inline-block}
+.faq{display:flex; flex-direction:column; gap:0}
+.faq h3{margin-bottom:8px}
+.faq details{border-top:1px solid var(--line-2); padding:12px 0}
+.faq summary{cursor:pointer; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+"; font-family:var(--f-mono); color:var(--muted); transition:transform .2s var(--ease-out)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin-top:8px; color:var(--muted)}
+.faq details[open] p{animation:rise .3s var(--ease-out) both}
+
+/* simulator */
+.sim-chart{width:100%; height:190px; display:block}
+.sim-msg{min-height:1.6em; margin:0}
+.ro{display:contents}
+.tabs{overflow-x:auto; scrollbar-width:none}
+.tabs button{white-space:nowrap}
+
+/* before you play */
+.warn-list{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:10px; max-width:64ch}
+.caution{border:1.5px solid var(--warn); background:var(--warn-soft); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.caution b{font-family:var(--f-head); font-stretch:110%; font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--warn)}
+.faq details a{color:var(--ink); text-underline-offset:3px}
+
+/* ---------- motion ---------- */
+:root{ --ease-out:cubic-bezier(.16,1,.3,1); --ease-spring:cubic-bezier(.34,1.56,.64,1) }
+.cards{perspective:800px}
+.card:not(.slot){animation:slide-in .42s var(--ease-out) both; animation-delay:calc(var(--i,0) * 80ms)}
+.card:not(.slot) .card-in{animation:flip .55s cubic-bezier(.45,.05,.25,1) both; animation-delay:calc(var(--i,0) * 80ms + 260ms)}
+@keyframes slide-in{from{transform:translate(-36px,-22px) rotate(-6deg); opacity:0} 50%{opacity:1}}
+@keyframes flip{
+  0%{transform:rotateY(180deg)}
+  50%{transform:rotateY(90deg) translateZ(14px)}
+  100%{transform:rotateY(0deg)}
+}
+.card.still, .card.still .card-in{animation:none}
+.slot{animation:fade .4s ease both}
+
+.enter{animation:rise .5s var(--ease-out) both; animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes rise{from{opacity:0; transform:translateY(14px)}}
+@keyframes fade{from{opacity:0}}
+.swap > *{animation:rise .38s var(--ease-out) both}
+.swap > *:nth-child(2){animation-delay:40ms} .swap > *:nth-child(3){animation-delay:80ms} .swap > *:nth-child(4){animation-delay:120ms} .swap > *:nth-child(n+5){animation-delay:160ms}
+
+.fb{animation:slidein .42s var(--ease-out) both}
+@keyframes slidein{from{opacity:0; transform:translateX(-10px); border-left-width:0}}
+
+.cell{transition:background-color .15s, color .15s, border-color .15s, transform .15s var(--ease-spring)}
+.cell:hover:not(:disabled){transform:translateY(-2px)}
+.cell.tap{animation:tap .28s var(--ease-spring)}
+@keyframes tap{50%{transform:scale(1.18)}}
+.cell.rev{animation:reveal .45s var(--ease-spring) both; animation-delay:var(--d,0ms)}
+.cell.wrong.rev{animation:reveal .45s var(--ease-spring) both, shake .4s ease var(--d2,0ms)}
+@keyframes reveal{0%{transform:scale(.6) rotateX(90deg); opacity:.2} 100%{transform:none; opacity:1}}
+@keyframes shake{20%,60%{transform:translateX(-3px)} 40%,80%{transform:translateX(3px)}}
+
+.opt{transition:border-color .15s, background-color .15s, transform .15s var(--ease-spring)}
+.opt:hover:not(:disabled){transform:translateY(-2px)}
+.opt.right{animation:pop .5s var(--ease-spring)}
+.opt.wrong{animation:shake .42s ease}
+@keyframes pop{40%{transform:scale(1.06)}}
+.btn{transition:transform .15s var(--ease-spring), background-color .15s, opacity .15s}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.meter span{transition:width .35s var(--ease-out)}
+.potbar div{transition:flex-grow .35s var(--ease-out)}
+.readout .v{transition:color .2s}
+.stats b{display:inline-block}
+.stats b.bump{animation:bump .5s var(--ease-spring)}
+@keyframes bump{40%{transform:scale(1.35); color:var(--red)}}
+.pager a small{transition:transform .2s var(--ease-out); display:inline-block}
+.pager a:not(.nx):hover small{transform:translateX(-4px)}
+.pager a.nx:hover small{transform:translateX(4px)}
+.toc a{transition:color .15s}
+.tabs button{transition:color .15s, border-color .2s}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+}
+.suit-s{color:var(--s)} .suit-h{color:var(--h)} .suit-d{color:var(--d)} .suit-c{color:var(--c)}
+@media (max-width:420px){ .card{width:48px; height:69px} .card .pip{font-size:1.45rem} .cards{gap:5px} }
+
+/* deck picker */
+.deck{display:grid; grid-template-columns:24px repeat(13, minmax(0,1fr)); gap:3px}
+.deck .rh{font-family:var(--f-mono); font-size:.7rem; color:var(--muted); text-align:center}
+.deck .sh{display:grid; place-items:center; font-size:1rem}
+.cell{height:34px; border:1px solid var(--line); background:var(--paper); border-radius:3px; font-family:var(--f-mono); font-weight:600; font-size:.78rem; padding:0; min-width:0}
+.cell.suit-s{color:var(--ink)}
+.cell:hover:not(:disabled){border-color:var(--ink)}
+.cell.known{background:var(--line-2); color:var(--muted); border-color:transparent; text-decoration:line-through; cursor:default}
+.cell.sel{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.cell.hit{background:var(--good); color:#fff; border-color:var(--good)}
+.cell.miss{border:2px dashed var(--good); color:var(--good)}
+.cell.wrong{background:var(--bad-soft); color:var(--bad); border-color:var(--bad); text-decoration:line-through}
+.cell.out{background:var(--good-soft); color:var(--good); border-color:var(--good)}
+@media (max-width:420px){ .deck{grid-template-columns:18px repeat(13, minmax(0,1fr)); gap:2px} .cell{height:30px; font-size:.7rem} }
+
+.bar-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--paper); border-radius:3px; padding:10px 18px; font-weight:600; font-size:.95rem}
+.btn.red{background:var(--red); border-color:var(--red); color:var(--red-ink)}
+.btn.line{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.4; cursor:default}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.count{font-family:var(--f-mono); font-size:.88rem; color:var(--muted)}
+
+.fb{padding:12px 14px; border-left:4px solid; display:flex; flex-direction:column; gap:4px; font-size:.95rem}
+.fb.good{background:var(--good-soft); border-color:var(--good)}
+.fb.bad{background:var(--bad-soft); border-color:var(--bad)}
+.fb.close{background:var(--warn-soft); border-color:var(--warn)}
+.fb .h{font-weight:600}
+.fb.good .h{color:var(--good)} .fb.bad .h{color:var(--bad)} .fb.close .h{color:var(--warn)}
+.fb p{margin:0}
+.math{font-family:var(--f-mono); font-size:.86rem; font-variant-numeric:tabular-nums}
+
+.tabs{display:flex; gap:0; border-bottom:1px solid var(--line)}
+.tabs button{border:0; background:none; padding:8px 14px; font-weight:600; font-size:.92rem; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink); border-color:var(--red)}
+
+.panel{background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:20px; display:flex; flex-direction:column; gap:16px}
+.choice{display:grid; grid-template-columns:repeat(auto-fit, minmax(110px,1fr)); gap:8px}
+.opt{border:1.5px solid var(--line); background:var(--paper); border-radius:3px; padding:12px 8px; font-family:var(--f-mono); font-weight:600; font-size:1.05rem}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--good); background:var(--good-soft); color:var(--good)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-soft); color:var(--bad)}
+.opt:disabled{cursor:default}
+.opt.word{font-family:var(--f-body); font-size:1rem}
+
+/* widgets */
+.slider{display:grid; grid-template-columns:90px 1fr 64px; gap:12px; align-items:center}
+.slider label{font-size:.9rem; font-weight:500}
+.slider output{font-family:var(--f-mono); text-align:right; font-weight:600}
+input[type=range]{width:100%; accent-color:var(--red)}
+.readout{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line)}
+.readout div{background:var(--paper); padding:12px 14px}
+.readout .k{font-size:.78rem; color:var(--muted)}
+.readout .v{font-family:var(--f-head); font-stretch:105%; font-weight:800; font-size:1.7rem; line-height:1.15; font-variant-numeric:tabular-nums}
+.meter{height:12px; background:var(--line-2); position:relative; border-radius:2px; overflow:hidden}
+.meter span{position:absolute; top:0; bottom:0; left:0}
+.potbar{display:flex; height:34px; border-radius:3px; overflow:hidden; font-family:var(--f-mono); font-size:.75rem; font-weight:600}
+.potbar div{display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden; min-width:0; transition:flex-grow .2s}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:.82rem; color:var(--muted)}
+.legend i{display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:-1px}
+
+table{width:100%; border-collapse:collapse; font-size:.92rem}
+th{text-align:right; font-size:.75rem; color:var(--muted); font-weight:600; padding:0 0 8px; border-bottom:2px solid var(--ink)}
+th:first-child, td:first-child{text-align:left}
+td{text-align:right; padding:8px 0; border-bottom:1px solid var(--line-2); font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+
+.pager{display:flex; justify-content:space-between; gap:12px; padding-top:20px; border-top:1px solid var(--line); flex-wrap:wrap}
+.pager a{text-decoration:none; display:flex; flex-direction:column; gap:2px; max-width:48%}
+.pager a small{color:var(--muted); font-size:.8rem}
+.pager a span{font-weight:600}
+.pager a.nx{text-align:right; margin-left:auto}
+.pager a:hover span{text-decoration:underline; text-underline-offset:3px}
+
+.stats{display:flex; gap:22px; flex-wrap:wrap; font-size:.88rem; color:var(--muted)}
+.stats b{color:var(--ink); font-family:var(--f-mono); font-weight:600}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.seg button{border:0; background:var(--paper); padding:6px 12px; font-size:.85rem; font-weight:500; color:var(--muted); border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+.num{width:96px; font:600 1.3rem var(--f-mono); padding:8px 12px; border-radius:3px; border:1.5px solid var(--line); background:var(--paper); color:var(--ink)}
+.num:focus{border-color:var(--ink); outline:none}
+.linkbtn{background:none; border:0; padding:0; color:var(--muted); text-decoration:underline; text-underline-offset:3px; font-size:.85rem}
+@media (prefers-reduced-motion: reduce){ .potbar div{transition:none} }
+
+/* game switch */
+.mast{align-items:center}
+.switch{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.switch .all{font-size:.85rem; color:var(--muted); text-decoration:none}
+.switch .all:hover{color:var(--ink); text-decoration:underline; text-underline-offset:3px}
+.sw{display:inline-flex; border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.sw a{padding:6px 14px; font-size:.88rem; font-weight:600; text-decoration:none; color:var(--muted); background:var(--paper); transition:background-color .15s, color .15s}
+.sw a:hover{color:var(--ink)}
+.sw a[aria-current]{background:var(--ink); color:var(--paper)}
+</style>
+</head>
+<body>
+<style>
+/* True Count additions */
+.tagrow{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line)}
+.tagrow > div{background:var(--paper); padding:14px; display:flex; flex-direction:column; gap:10px}
+.tagrow .tv{font-family:var(--f-head); font-weight:800; font-size:2rem; line-height:1}
+.tagrow .tv.p{color:var(--good)} .tagrow .tv.m{color:var(--bad)} .tagrow .tv.z{color:var(--muted)}
+.tagrow .mini{display:flex; flex-wrap:wrap; gap:4px; font-family:var(--f-mono); font-weight:600; font-size:.9rem}
+.tagrow .mini span{border:1px solid var(--line); border-radius:3px; padding:2px 7px}
+@media (max-width:520px){ .tagrow{grid-template-columns:minmax(0,1fr)} }
+.flash{display:flex; flex-direction:column; align-items:center; gap:14px; padding:20px; background:var(--felt); border-radius:4px; color:var(--felt-ink)}
+.flash .card{width:84px; height:120px}
+.flash .card .ix i{font-size:1.5rem} .flash .card .pip{font-size:2.6rem}
+.tagbtns{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; width:100%; max-width:360px}
+.tagbtns .opt{background:var(--paper)}
+.seq{display:flex; gap:6px; flex-wrap:wrap}
+.seq .step{display:flex; flex-direction:column; align-items:center; gap:4px}
+.seq .step small{font-family:var(--f-mono); font-size:.75rem; color:var(--felt-muted)}
+.rc-big{font-family:var(--f-head); font-weight:800; font-size:2.6rem; line-height:1; font-variant-numeric:tabular-nums}
+.tray{display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap}
+.tray-box{width:74px; height:170px; border:2px solid var(--ink); border-top:0; border-radius:0 0 4px 4px; position:relative; background:var(--paper)}
+.tray-fill{position:absolute; left:3px; right:3px; bottom:3px; background:repeating-linear-gradient(0deg, #a3122a 0 2px, #f4f4ef 2px 3px); transition:height .4s var(--ease-out)}
+.tray-ticks{position:absolute; inset:0; pointer-events:none}
+.tray-ticks span{position:absolute; left:-2px; right:-2px; border-top:1px dashed var(--muted)}
+.tray-ticks em{position:absolute; left:calc(100% + 8px); transform:translateY(-50%); font:500 .7rem var(--f-mono); color:var(--muted); font-style:normal; white-space:nowrap}
+.tray-cap{font-size:.82rem; color:var(--muted); max-width:24ch}
+.table-round{display:flex; flex-wrap:wrap; gap:18px}
+.hand{display:flex; flex-direction:column; gap:6px}
+.hand .cards .card{width:46px; height:66px} .hand .cards .card .pip{font-size:1.35rem} .hand .cards .card .ix i{font-size:.9rem}
+.hand .cards{gap:4px}
+.big-card-slot{min-height:120px; display:grid; place-items:center}
+.timer{font-family:var(--f-mono); font-size:.88rem; color:var(--felt-muted)}
+</style>
+
+<header class="mast">
+  <div>
+    <h1><a href="#home" class="home-link">True <span>Count</span></a></h1>
+    <p>A short course on Hi-Lo card counting in blackjack</p>
+  </div>
+  <nav class="switch" aria-label="Games"><a class="all" href="index.html">All games</a><span class="sw"><a href="poker.html">Poker</a><a href="blackjack.html" aria-current="page">Blackjack</a></span></nav>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Lessons">
+    <h2>Contents</h2>
+    <ol id="toc"></ol>
+  </nav>
+  <main class="lesson" id="lesson" aria-live="polite"></main>
+</div>
+
+<script>
+(function(){
+  const SUITS = ['s','h','d','c'];
+  const GLYPH = {s:'♠', h:'♥', d:'♦', c:'♣'};
+  const SNAME = {s:'spades', h:'hearts', d:'diamonds', c:'clubs'};
+  const RL = {2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A'};
+  const RN = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14};
+  const DECK = []; for (const s of SUITS) for (let r = 2; r <= 14; r++) DECK.push({r, s, id: r + s});
+  const parse = str => str.trim().split(/\s+/).map(t => ({r: RN[t[0]], s: t[1], id: RN[t[0]] + t[1]}));
+  const tag = c => c.r <= 6 ? 1 : c.r <= 9 ? 0 : -1;
+  const sgn = v => v > 0 ? '+' + v : v < 0 ? '−' + Math.abs(v) : '0';
+  const rnd = n => Math.floor(Math.random()*n);
+  const shuffle = a => { for (let i = a.length-1; i > 0; i--){ const j = rnd(i+1); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+  const shoe = decks => { const a = []; for (let d = 0; d < decks; d++) a.push(...DECK.map(c => ({...c, id: c.id + '-' + d}))); return shuffle(a); };
+  const h = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+  const cardHTML = (c, i = 0) => `<div class="card suit-${c.s}" style="--i:${i}" role="img" aria-label="${RL[c.r]} of ${SNAME[c.s]}"><div class="card-in"><div class="face front"><span class="ix"><i>${RL[c.r]}</i><u>${GLYPH[c.s]}</u></span><span class="pip">${GLYPH[c.s]}</span></div><div class="face back"></div></div></div>`;
+  const parseCount = v => { const t = String(v).trim().replace('−','-').replace('+',''); if (!/^-?\d+$/.test(t)) return NaN; return parseInt(t, 10); };
+
+  function slider({id, label, min, max, step = 1, value, fmt = v => v, ticks = [], onInput}){
+    const el = h(`<div class="sl">
+      <div class="sl-head"><label for="${id}">${label}</label>
+        <div class="stepper"><button type="button" data-d="-1" aria-label="Decrease ${label}">−</button><output for="${id}"></output><button type="button" data-d="1" aria-label="Increase ${label}">+</button></div></div>
+      <div class="sl-track"><input class="rng" id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${value}">
+        <div class="ticks" aria-hidden="true">${ticks.map(t => `<span style="--t:${(t-min)/(max-min)}">${fmt(t)}</span>`).join('')}</div></div>
+    </div>`);
+    const inp = el.querySelector('input'), out = el.querySelector('output');
+    const sync = () => { const v = +inp.value; inp.style.setProperty('--p', ((v-min)/(max-min)*100) + '%'); out.textContent = fmt(v); if (onInput) onInput(v); };
+    inp.addEventListener('input', sync);
+    el.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { inp.value = Math.min(max, Math.max(min, +inp.value + (+b.dataset.d)*step)); sync(); }));
+    el.value = () => +inp.value; el.sync = sync;
+    return el;
+  }
+  function trayHTML(decksTotal, decksPlayed){
+    let ticks = '';
+    for (let d = 0; d <= decksTotal; d++){
+      const y = 100 - (d / decksTotal) * 100;
+      ticks += `<span style="top:${y}%"></span>${d > 0 ? `<em style="top:${y}%">${d} deck${d > 1 ? 's' : ''}</em>` : ''}`;
+    }
+    return `<div class="tray"><div class="tray-box" role="img" aria-label="Discard tray holding ${decksPlayed} of ${decksTotal} decks"><div class="tray-fill" style="height:calc(${decksPlayed / decksTotal * 100}% - 3px)"></div><div class="tray-ticks">${ticks}</div></div><p class="tray-cap" style="margin-left:56px">Discard tray of a ${decksTotal}-deck shoe</p></div>`;
+  }
+
+  const KEY = 'true-count-course-v1';
+  let prog = {done:{}, st:{flashR:0, flashT:0, cdR:0, cdT:0, tableR:0, tableT:0, tcR:0, tcT:0}};
+  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.st) prog = Object.assign(prog, s); } catch(e){}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(prog)); } catch(e){} };
+  const acc = (r,t) => t ? Math.round(100*r/t) + '%' : '–';
+  const swap = el => { el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); };
+
+  /* ---------------- lessons ---------------- */
+  const L = [];
+
+  L.push({id:'why', title:'Why counting works', blurb:'Why a shoe full of tens and aces is good for you and bad for the casino.', render(el){
+    el.append(
+      h(`<p class="lead">In blackjack, cards aren't reshuffled after every hand. Casinos deal from a shoe of several decks, often six or eight, and play through most of it first. So the cards already dealt change what's left, and what's left changes your odds.</p>`),
+      h(`<div class="stack"><h3>High cards help the player</h3>
+        <p>When the remaining shoe holds lots of tens and aces:</p>
+        <ul class="warn-list">
+          <li><strong>You get more blackjacks,</strong> and a blackjack pays 3 to 2. The dealer gets more too, but the dealer only wins even money with one.</li>
+          <li><strong>The dealer busts more.</strong> The dealer must hit until 17, so a stiff hand like 15 or 16 is more likely to take a ten and bust.</li>
+          <li><strong>Your doubles land better.</strong> Doubling on 10 or 11 works best when a ten is likely to come.</li>
+        </ul></div>`),
+      h(`<div class="stack"><h3>Low cards help the dealer</h3>
+        <p>A shoe full of 2s through 6s does the opposite. The dealer is forced to hit stiff hands and those small cards rescue them instead of busting them.</p></div>`),
+      h(`<p>Card counting is a way of keeping a rough tally of which kind of cards have gone, so you know when the shoe has turned in your favour. You bet more when it has and less when it hasn't. It isn't memorising every card, and it isn't illegal.</p>`),
+      h(`<div class="note"><b>Remember</b><p>Counting gives a small edge, typically around 1% overall, and only to someone who already plays every hand correctly. It's a long-run skill, not a way to win tonight.</p></div>`)
+    );
+  }});
+
+  L.push({id:'hi-lo', title:'Hi-Lo card values', blurb:'The three tags every card gets: plus one, zero or minus one.', render(el){
+    el.append(
+      h(`<p class="lead">The Hi-Lo count, the most widely taught system, gives every card one of three values. You keep a single running number in your head.</p>`),
+      h(`<div class="tagrow">
+        <div><span class="tv p">+1</span><div class="mini"><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div><p class="muted" style="font-size:.88rem">Low cards. When they leave, the shoe gets richer in high cards.</p></div>
+        <div><span class="tv z">0</span><div class="mini"><span>7</span><span>8</span><span>9</span></div><p class="muted" style="font-size:.88rem">Neutral. Ignore them.</p></div>
+        <div><span class="tv m">−1</span><div class="mini"><span>10</span><span>J</span><span>Q</span><span>K</span><span>A</span></div><p class="muted" style="font-size:.88rem">High cards. When they leave, the shoe gets worse for you.</p></div>
+      </div>`),
+      h(`<p>A full deck has twenty +1 cards and twenty −1 cards, so if you count every card in a deck correctly you finish at exactly 0. That makes a full deck the standard way to check yourself.</p>`)
+    );
+    const box = h(`<div class="panel"><h3>Tag the card</h3><p class="muted" style="margin:0">Press the value as fast as you can. You can also use the keys <span class="n">1</span>, <span class="n">2</span> and <span class="n">3</span>.</p>
+      <div class="flash"><div class="big-card-slot"></div><div class="tagbtns"><button class="opt" data-v="1">+1</button><button class="opt" data-v="0">0</button><button class="opt" data-v="-1">−1</button></div></div>
+      <p class="sim-msg muted" aria-live="polite">Streak: 0</p></div>`);
+    let cur, streak = 0, best = 0, k = 0;
+    const next = () => { cur = DECK[rnd(52)]; box.querySelector('.big-card-slot').innerHTML = cardHTML(cur); };
+    const answer = v => {
+      const ok = v === tag(cur); prog.st.flashT++; if (ok) prog.st.flashR++; save();
+      streak = ok ? streak + 1 : 0; best = Math.max(best, streak);
+      box.querySelector('.sim-msg').innerHTML = ok ? `Streak: <strong>${streak}</strong> (best ${best})` : `<strong style="color:var(--bad)">${RL[cur.r]} is ${sgn(tag(cur))}.</strong> Streak reset.`;
+      next();
+    };
+    box.querySelector('.tagbtns').addEventListener('click', e => { const b = e.target.closest('button'); if (b) answer(+b.dataset.v); });
+    const onKey = e => { if (!box.isConnected){ document.removeEventListener('keydown', onKey); return; } const m = {'1':1,'2':0,'3':-1}[e.key]; if (m !== undefined) answer(m); };
+    document.addEventListener('keydown', onKey);
+    next();
+    el.append(box, h(`<div class="note"><b>Remember</b><p>2 to 6 is +1. 7, 8, 9 is 0. Tens, faces and aces are −1.</p></div>`));
+  }});
+
+  L.push({id:'running-count', title:'The running count', blurb:'Adding the tags together as cards hit the table.', render(el){
+    const seq = parse('5h Kd 3c 9s As 6d 2h Qc');
+    el.append(
+      h(`<p class="lead">The running count starts at 0 when the shoe is shuffled. Every card you see, yours, other players' and the dealer's, adds its tag. You carry the total from hand to hand until the next shuffle.</p>`)
+    );
+    const demo = h(`<div class="panel"><h3>Watch it build</h3>
+      <div class="felt" style="align-items:center"><div class="seq"></div><div style="margin-left:auto;text-align:right"><span class="lbl">Running count</span><div class="rc-big" id="rc">0</div></div></div>
+      <div class="bar-row"><button class="btn" id="nx">Next card</button><button class="linkbtn" id="rs">Start over</button></div>
+      <p class="muted" id="why" style="margin:0">Press Next card.</p></div>`);
+    let i = 0, rc = 0;
+    const draw = () => {
+      demo.querySelector('.seq').innerHTML = seq.slice(0, i).map((c, k) => `<div class="step">${cardHTML(c, k === i-1 ? 0 : 0)}<small>${sgn(tag(c))}</small></div>`).join('');
+      demo.querySelectorAll('.seq .card').forEach((c, k) => { if (k < i-1) { c.style.animation = 'none'; c.querySelector('.card-in').style.animation = 'none'; } });
+      demo.querySelector('#rc').textContent = sgn(rc);
+      demo.querySelector('#nx').disabled = i >= seq.length;
+    };
+    demo.querySelector('#nx').addEventListener('click', () => {
+      const c = seq[i++]; rc += tag(c);
+      demo.querySelector('#why').textContent = `${RL[c.r]} is ${sgn(tag(c))}, so the count goes to ${sgn(rc)}.` + (i === seq.length ? ' That\'s the whole sequence.' : '');
+      draw();
+    });
+    demo.querySelector('#rs').addEventListener('click', () => { i = 0; rc = 0; demo.querySelector('#why').textContent = 'Press Next card.'; draw(); });
+    draw();
+    el.append(demo, h(`<div class="stack"><h3>Count in pairs</h3><p>Pros rarely add one card at a time. A high card and a low card cancel out, so a K and a 5 together are 0. Look for pairs that cancel and you'll count a whole hand at a glance.</p></div>`));
+    const tryBox = h(`<div class="panel"><h3>Your turn</h3><div class="felt"><div class="cards try-cards"></div></div>
+      <form class="bar-row" id="tf"><input class="num" id="ti" inputmode="numeric" aria-label="Running count" placeholder="0" required><button class="btn" type="submit">Check</button><button type="button" class="linkbtn" id="nw">New cards</button></form><div class="out"></div></div>`);
+    let cards;
+    const deal = () => { cards = shuffle(DECK.slice()).slice(0, 8); tryBox.querySelector('.try-cards').innerHTML = cards.map(cardHTML).join(''); tryBox.querySelector('.out').innerHTML = ''; tryBox.querySelector('#ti').value = ''; };
+    tryBox.querySelector('#nw').addEventListener('click', deal);
+    tryBox.querySelector('#tf').addEventListener('submit', e => {
+      e.preventDefault(); const g = parseCount(tryBox.querySelector('#ti').value); if (isNaN(g)) return;
+      const ans = cards.reduce((a,c) => a + tag(c), 0), ok = g === ans;
+      tryBox.querySelector('.out').replaceWith(h(`<div class="out fb ${ok?'good':'bad'}"><span class="h">${ok ? `Right, ${sgn(ans)}.` : `It's ${sgn(ans)}.`}</span><p class="math">${cards.map(c => sgn(tag(c))).join('  ')}</p></div>`));
+    });
+    deal();
+    el.append(tryBox, h(`<div class="note"><b>Remember</b><p>The running count only resets when the shoe is shuffled, not between hands.</p></div>`));
+  }});
+
+  L.push({id:'true-count', title:'The true count', blurb:'Adjusting for how many decks are left in the shoe.', render(el){
+    el.append(
+      h(`<p class="lead">A running count of +6 means something very different with one deck left than with five. Six extra high cards in a single deck is a big deal. Spread across five decks, it matters far less.</p>`),
+      h(`<div class="stack"><p>So you convert the running count into a <strong>true count</strong>: the count per deck still to be dealt.</p>
+        <p class="math" style="font-size:.95rem">true count = running count ÷ decks remaining</p>
+        <p>You estimate decks remaining by glancing at the discard tray and subtracting from the shoe size. Most players drop the fraction: +7 with 2.5 decks left is +2.8, which you play as +2.</p></div>`)
+    );
+    const w = h(`<div class="panel"><h3>Try different shoes</h3><div class="tray-wrap"></div>
+      <div class="readout"><div><div class="k">Decks remaining</div><div class="v" id="dr"></div></div><div><div class="k">Exact</div><div class="v" id="ex"></div></div><div><div class="k">True count</div><div class="v" id="tc"></div></div></div></div>`);
+    const upd = () => {
+      const rc = rcS.value(), played = plS.value(), left = 6 - played, ex = rc / left, tc = Math.trunc(ex);
+      w.querySelector('.tray-wrap').innerHTML = trayHTML(6, played);
+      w.querySelector('#dr').textContent = left;
+      w.querySelector('#ex').textContent = (ex > 0 ? '+' : ex < 0 ? '−' : '') + Math.abs(ex).toFixed(1);
+      w.querySelector('#tc').textContent = sgn(tc);
+    };
+    const rcS = slider({id:'rc-s', label:'Running count', min:-20, max:20, value:8, fmt:sgn, ticks:[-20,-10,0,10,20], onInput:() => upd()});
+    const plS = slider({id:'pl-s', label:'Decks in the tray', min:0, max:5.5, step:0.5, value:2, fmt:v => v, ticks:[0,1,2,3,4,5], onInput:() => upd()});
+    w.querySelector('h3').after(rcS, plS);
+    rcS.sync(); plS.sync();
+    el.append(w, h(`<div class="note"><b>Remember</b><p>Divide by decks remaining, not decks played. Half a deck is about 26 cards, a stack roughly 1 cm tall.</p></div>`));
+  }});
+
+  L.push({id:'betting', title:'Betting with the count', blurb:'How the true count turns into a bet size.', render(el){
+    el.append(
+      h(`<p class="lead">Counting only pays when you change your bet. You bet the minimum when the count is low or negative and raise it as the true count climbs.</p>`),
+      h(`<div class="stack"><p>A useful rule of thumb: with good rules and perfect basic strategy the casino starts with an edge of about 0.5%, and each +1 of true count moves about 0.5% toward you.</p>
+        <p class="math" style="font-size:.95rem">your edge ≈ (true count × 0.5%) − 0.5%</p>
+        <p>So at a true count of +1 you're about even, and from +2 upward you have the edge. That's where the bet goes up.</p></div>`)
+    );
+    const ramp = tc => tc <= 1 ? 1 : tc === 2 ? 2 : tc === 3 ? 4 : tc === 4 ? 6 : 8;
+    const w = h(`<div class="panel"><h3>See your edge</h3>
+      <div class="readout"><div><div class="k">Your edge</div><div class="v" id="ed"></div></div><div><div class="k">Example bet</div><div class="v" id="bt"></div></div></div>
+      <p class="muted" id="bn" style="margin:0"></p></div>`);
+    const upd = () => {
+      const tc = tS.value(), edge = tc * 0.5 - 0.5;
+      const e = w.querySelector('#ed'); e.textContent = (edge > 0 ? '+' : edge < 0 ? '−' : '') + Math.abs(edge).toFixed(1) + '%';
+      e.style.color = edge > 0 ? 'var(--good)' : edge < 0 ? 'var(--bad)' : '';
+      w.querySelector('#bt').textContent = ramp(tc) + (ramp(tc) === 1 ? ' unit' : ' units');
+      w.querySelector('#bn').textContent = edge > 0 ? 'The shoe favours you. Raise your bet.' : edge < 0 ? 'The casino has the edge. Bet the minimum, or leave the table if the count drops far.' : 'Roughly break-even. Keep the minimum bet.';
+    };
+    const tS = slider({id:'tc-s', label:'True count', min:-4, max:6, value:2, fmt:sgn, ticks:[-4,-2,0,2,4,6], onInput:() => upd()});
+    w.querySelector('h3').after(tS); tS.sync();
+    el.append(w,
+      h(`<div class="stack"><h3>An example bet ramp</h3><div class="tbl"><table><thead><tr><th>True count</th><th>Bet</th></tr></thead><tbody>
+        <tr><td>+1 or lower</td><td class="n">1 unit</td></tr><tr><td>+2</td><td class="n">2 units</td></tr><tr><td>+3</td><td class="n">4 units</td></tr><tr><td>+4</td><td class="n">6 units</td></tr><tr><td>+5 or higher</td><td class="n">8 units</td></tr>
+      </tbody></table></div><p class="muted">A unit is your minimum bet. Real ramps depend on your bankroll and how much attention a big jump in bets draws.</p></div>`),
+      h(`<div class="note"><b>Remember</b><p>The figures here are approximations. The real starting edge depends on the table's rules, and a table that pays 6 to 5 for blackjack instead of 3 to 2 adds about 1.4% to the house edge, which wipes out what counting gains.</p></div>`)
+    );
+  }});
+
+  L.push({id:'basic-strategy', title:'Basic strategy comes first', blurb:'Why counting is worthless if you misplay your hands.', render(el){
+    el.append(
+      h(`<p class="lead">Basic strategy is the mathematically best way to play each hand against each dealer upcard. Counting is built on top of it. Without it, the casino's edge is far bigger than anything counting can win back.</p>`),
+      h(`<p>Learn a basic strategy chart for the exact rules at your table (number of decks, whether the dealer hits soft 17, whether you can double after splitting). Charts are free and widely published. A few plays hold almost everywhere:</p>`),
+      h(`<ul class="warn-list">
+        <li><strong>Always split aces and eights.</strong></li>
+        <li><strong>Never split tens or fives.</strong> Twenty is a great hand, and two fives are better played as a ten.</li>
+        <li><strong>Stand on hard 17 or more.</strong></li>
+        <li><strong>Don't take insurance</strong> unless you're counting. With Hi-Lo, insurance becomes a good bet once the true count reaches +3.</li>
+      </ul>`),
+      h(`<div class="note"><b>Remember</b><p>Practise basic strategy until it's automatic. You can't keep a count if you're still thinking about whether to hit.</p></div>`)
+    );
+  }});
+
+  L.push({id:'practice', title:'Practice', render(el){ practice(el); }});
+  L.push({id:'before-you-play', title:'Before you play', render(el){
+    el.append(
+      h(`<p class="lead">Counting is a real skill, but casinos know about it. Read this before you try it with money.</p>`),
+      h(`<div class="stack"><h3>Is it legal?</h3>
+        <p>Counting in your head is legal in the US and most other places. It's just paying attention. Using a phone, app or any device to help you count at the table is a different matter, and in some places, including Nevada, it's a crime.</p></div>`),
+      h(`<div class="stack"><h3>Casinos can still stop you</h3>
+        <p>A casino is a private business. If it suspects you're counting it can limit your bets, shuffle early, ask you to play only other games, or ask you to leave. Big jumps in bet size are the usual giveaway.</p></div>`),
+      h(`<div class="stack"><h3>Games where counting doesn't work</h3>
+        <ul class="warn-list">
+          <li><strong>Continuous shuffling machines.</strong> Cards go straight back into the machine after each hand, so the shoe never runs down and the count never builds.</li>
+          <li><strong>Shallow penetration.</strong> If the dealer shuffles with half the shoe still undealt, high counts rarely show up.</li>
+          <li><strong>6 to 5 blackjack.</strong> Paying 6 to 5 instead of 3 to 2 costs more than counting earns.</li>
+          <li><strong>Online blackjack.</strong> Most games reshuffle after every hand, and live-dealer streams usually shuffle early, which makes counting pointless.</li>
+          <li><strong>Poker.</strong> Every hand is dealt from a fresh deck. For poker, counting outs is the useful skill.</li>
+        </ul></div>`),
+      h(`<div class="stack"><h3>The edge is small and the swings are big</h3>
+        <p>Even a skilled counter has an overall edge of roughly 1% or less. Losing streaks of dozens of hands are normal. Players who count seriously keep a bankroll many times their biggest bet so a bad run doesn't wipe them out.</p></div>`),
+      h(`<div class="caution"><b>Gambling involves real risk</b>
+        <p>Counting doesn't guarantee you'll win, and in the short run luck decides most sessions. Only play with money you can afford to lose, check the legal age where you live (usually 18 or 21), and set a limit before you sit down.</p>
+        <p>If gambling stops being fun, help is free and confidential. In the US, call or text <strong class="n">1-800-GAMBLER</strong>. Elsewhere, search for your country's gambling helpline.</p></div>`)
+    );
+  }});
+
+  /* ---------------- practice ---------------- */
+  function practice(el){
+    el.append(h(`<p class="lead">Three drills. Start with counting down a deck, then move on to full table rounds and true count conversions.</p>`));
+    const tabs = h(`<div class="tabs" role="tablist"><button role="tab" data-k="deck" aria-selected="true">Count down a deck</button><button role="tab" data-k="table" aria-selected="false">Table rounds</button><button role="tab" data-k="tc" aria-selected="false">True count</button></div>`);
+    const stats = h(`<div class="stats"></div>`);
+    const body = h(`<div class="panel"></div>`);
+    el.append(tabs, stats, body);
+    const S = prog.st;
+    const drawStats = () => stats.innerHTML = `<span>Deck countdown <b>${acc(S.cdR,S.cdT)}</b></span><span>Table rounds <b>${acc(S.tableR,S.tableT)}</b></span><span>True count <b>${acc(S.tcR,S.tcT)}</b></span><button class="linkbtn" id="rs">Reset stats</button>`;
+    stats.addEventListener('click', e => { if (e.target.id === 'rs'){ Object.keys(S).forEach(k => S[k] = 0); save(); drawStats(); } });
+    let timer = null;
+    const stop = () => { if (timer){ clearTimeout(timer); timer = null; } };
+    const modes = {deck, table, tc};
+    tabs.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; tabs.querySelectorAll('button').forEach(x => x.setAttribute('aria-selected', x === b)); stop(); modes[b.dataset.k](); });
+
+    function deck(){
+      body.innerHTML = `<h3>Count down a deck</h3><p class="muted" style="margin:0">Cards flip one at a time. Keep the running count in your head, then enter it at the end. A full deck should finish at 0. Choose "Part of a deck" for an answer you can't guess.</p>
+        <div class="seg" role="group" aria-label="Length"><button data-len="52" aria-pressed="true">Full deck</button><button data-len="20" aria-pressed="false">Part of a deck</button></div>
+        <div class="sp-wrap"></div>
+        <div class="flash"><div class="big-card-slot"><span class="timer">Press start</span></div><span class="timer" id="prog"></span></div>
+        <div class="bar-row"><button class="btn red" id="go">Start</button></div><div class="out"></div>`;
+      swap(body);
+      let len = 52;
+      body.querySelector('.seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; len = +b.dataset.len; body.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+      const sp = slider({id:'sp-s', label:'Seconds per card', min:0.3, max:2, step:0.1, value:1, fmt:v => v.toFixed(1) + 's', ticks:[0.3, 1, 1.5, 2].map(Number)});
+      body.querySelector('.sp-wrap').append(sp); sp.sync();
+      body.querySelector('#go').addEventListener('click', () => {
+        stop();
+        const cards = shuffle(DECK.slice()).slice(0, len), ms = sp.value() * 1000; let i = 0;
+        const go = body.querySelector('#go'); go.disabled = true;
+        body.querySelector('.out').innerHTML = '';
+        const t0 = performance.now();
+        const step = () => {
+          if (!body.isConnected) return;
+          if (i < cards.length){
+            body.querySelector('.big-card-slot').innerHTML = cardHTML(cards[i]);
+            body.querySelector('#prog').textContent = `${i+1} of ${cards.length}`;
+            i++; timer = setTimeout(step, ms);
+          } else {
+            const secs = ((performance.now() - t0) / 1000).toFixed(0);
+            body.querySelector('.big-card-slot').innerHTML = '<span class="timer">Done</span>';
+            const out = h(`<form class="out stack"><p style="margin:0">What's the running count?</p><div class="bar-row"><input class="num" id="ci" inputmode="numeric" aria-label="Running count" required><button class="btn" type="submit">Check</button></div></form>`);
+            body.querySelector('.out').replaceWith(out); out.querySelector('#ci').focus({preventScroll:true});
+            out.addEventListener('submit', e => {
+              e.preventDefault(); const g = parseCount(out.querySelector('#ci').value); if (isNaN(g)) return;
+              const ans = cards.reduce((a,c) => a + tag(c), 0), ok = g === ans;
+              S.cdT++; if (ok) S.cdR++; save(); drawStats();
+              out.replaceWith(h(`<div class="out fb ${ok?'good':'bad'}"><span class="h">${ok ? `Right, ${sgn(ans)}.` : `You said ${sgn(g)}. It was ${sgn(ans)}.`}</span><p>${cards.length} cards in about ${secs} seconds. ${ok && sp.value() > 0.5 ? 'Try a faster speed.' : ''}</p></div>`));
+              go.disabled = false; go.textContent = 'Go again';
+            });
+          }
+        };
+        step();
+      });
+    }
+
+    function table(){
+      const DECKS = 6;
+      let sh = shoe(DECKS), pos = 0, rc = 0, round = 0;
+      const cut = Math.floor(DECKS * 52 * 0.75);
+      body.innerHTML = `<h3>Table rounds</h3><p class="muted" style="margin:0">A 6-deck shoe at a table of three players. After each round, enter the running count for the whole shoe so far.</p>
+        <div class="felt" style="flex-direction:column; align-items:stretch"><div class="table-round"></div><span class="timer" id="shoeinfo"></span></div>
+        <form class="bar-row" id="rf"><input class="num" id="ri" inputmode="numeric" aria-label="Running count" required><button class="btn" type="submit">Check</button></form><div class="out"></div>`;
+      swap(body);
+      const total = hand => { let t = 0, aces = 0; for (const c of hand){ const v = c.r === 14 ? 11 : Math.min(10, c.r); t += v; if (c.r === 14) aces++; } while (t > 21 && aces){ t -= 10; aces--; } return t; };
+      const take = () => sh[pos++];
+      function deal(){
+        if (pos > cut){ sh = shoe(DECKS); pos = 0; rc = 0; body.querySelector('.out').innerHTML = ''; body.querySelector('.out').append(h(`<div class="fb close"><span class="h">The cut card came out. New shoe, count back to 0.</span></div>`)); }
+        round++;
+        const hands = [[take(), take()], [take(), take()], [take(), take()]], dealer = [take(), take()];
+        for (const hd of hands){ while (total(hd) < 12 + rnd(5)) hd.push(take()); }
+        while (total(dealer) < 17) dealer.push(take());
+        const all = [...hands.flat(), ...dealer];
+        all.forEach(c => rc += tag(c));
+        const seats = hands.map((hd, k) => `<div class="hand"><span class="lbl">Player ${k+1}</span><div class="cards">${hd.map((c,i) => cardHTML(c, i + k)).join('')}</div></div>`).join('');
+        body.querySelector('.table-round').innerHTML = seats + `<div class="hand"><span class="lbl">Dealer</span><div class="cards">${dealer.map((c,i) => cardHTML(c, i + 4)).join('')}</div></div>`;
+        const left = (DECKS * 52 - pos) / 52;
+        body.querySelector('#shoeinfo').textContent = `Round ${round} · about ${left.toFixed(1)} decks left in the shoe`;
+        const inp = body.querySelector('#ri'); inp.value = ''; inp.disabled = false; body.querySelector('#rf button').disabled = false; inp.focus({preventScroll:true});
+        table._ans = rc; table._left = left;
+      }
+      body.querySelector('#rf').addEventListener('submit', e => {
+        e.preventDefault(); const g = parseCount(body.querySelector('#ri').value); if (isNaN(g)) return;
+        const ans = table._ans, ok = g === ans, tc = Math.trunc(ans / table._left);
+        S.tableT++; if (ok) S.tableR++; save(); drawStats();
+        body.querySelector('#ri').disabled = true; body.querySelector('#rf button').disabled = true;
+        const out = h(`<div class="out stack"><div class="fb ${ok?'good':'bad'}"><span class="h">${ok ? `Right, ${sgn(ans)}.` : `It's ${sgn(ans)}.`}</span><p class="math">true count ≈ ${sgn(ans)} ÷ ${table._left.toFixed(1)} → ${sgn(tc)}</p></div><div class="bar-row"><button class="btn" id="nr">Deal next round</button></div></div>`);
+        body.querySelector('.out').replaceWith(out);
+        const nb = out.querySelector('#nr'); nb.focus({preventScroll:true});
+        nb.addEventListener('click', () => { out.replaceWith(h('<div class="out"></div>')); deal(); });
+      });
+      deal();
+    }
+
+    function tc(){
+      body.innerHTML = `<h3>True count</h3><p class="muted" style="margin:0">Read the discard tray, work out the decks remaining in this 6-deck shoe, then divide. Drop the fraction.</p>
+        <div class="tray-wrap"></div><p class="lead" id="tq"></p>
+        <form class="bar-row" id="qf"><input class="num" id="qi" inputmode="numeric" aria-label="True count" required><button class="btn" type="submit">Check</button></form><div class="out"></div>`;
+      swap(body);
+      let rcv, played;
+      const ask = () => {
+        played = (1 + rnd(9)) / 2; const left = 6 - played;
+        do { rcv = rnd(31) - 12; } while (rcv === 0);
+        body.querySelector('.tray-wrap').innerHTML = trayHTML(6, played);
+        body.querySelector('#tq').innerHTML = `Running count <strong>${sgn(rcv)}</strong>. What's the true count?`;
+        const i = body.querySelector('#qi'); i.value = ''; i.disabled = false; body.querySelector('#qf button').disabled = false; i.focus({preventScroll:true});
+      };
+      body.querySelector('#qf').addEventListener('submit', e => {
+        e.preventDefault(); const g = parseCount(body.querySelector('#qi').value); if (isNaN(g)) return;
+        const left = 6 - played, ex = rcv / left, t = Math.trunc(ex), f = Math.floor(ex);
+        const ok = g === t || g === f; S.tcT++; if (ok) S.tcR++; save(); drawStats();
+        body.querySelector('#qi').disabled = true; body.querySelector('#qf button').disabled = true;
+        const out = h(`<div class="out stack"><div class="fb ${ok?'good':'bad'}"><span class="h">${ok ? 'Right.' : `It's ${sgn(t)}.`}</span><p class="math">${played} decks in the tray → ${left} left · ${sgn(rcv)} ÷ ${left} = ${ex.toFixed(2)} → ${sgn(t)}</p></div><div class="bar-row"><button class="btn" id="nq">Next</button></div></div>`);
+        body.querySelector('.out').replaceWith(out);
+        const nb = out.querySelector('#nq'); nb.focus({preventScroll:true});
+        nb.addEventListener('click', () => { out.replaceWith(h('<div class="out"></div>')); ask(); });
+      });
+      ask();
+    }
+
+    drawStats(); deck();
+  }
+
+  /* ---------------- home + router ---------------- */
+  const toc = document.getElementById('toc'), main = document.getElementById('lesson');
+  const LESSONS = L.filter(l => l.blurb).length;
+  function drawToc(cur){
+    toc.innerHTML = `<li><a href="#home" ${cur === 'home' ? 'aria-current="page"' : ''}><span class="no">·</span><span>Introduction</span></a></li>` +
+      L.map((l,i) => `<li><a href="#${l.id}" class="${prog.done[l.id] ? 'done' : ''}" ${l.id === cur ? 'aria-current="page"' : ''}><span class="no">${i+1}</span><span>${l.title}</span></a></li>`).join('');
+  }
+  function renderHome(){
+    const ex = parse('5h Kd 3c 9s 6d');
+    main.append(
+      h(`<p class="kicker">A free course on blackjack card counting</p>`),
+      h(`<h2 class="home-h">Know when the shoe is on your side.</h2>`),
+      h(`<p class="lead">True Count teaches the Hi-Lo system, the counting method most players start with. Six short lessons, three drills to build speed, and an honest page about what casinos do when they spot a counter.</p>`),
+      h(`<div class="bar-row"><a class="btn red" href="#why">Start lesson 1</a><a class="btn line" href="#practice">Go straight to practice</a></div>`),
+      h(`<div class="home-ex"><div class="felt"><div class="grp"><span class="lbl">Cards dealt</span><div class="cards">${ex.map((c,i) => cardHTML(c, i)).join('')}</div></div></div>
+        <ol class="method">
+          <li><b>Tag each card</b><span>Low cards +1, high cards −1, 7 to 9 are 0.</span><em>+1 −1 +1 0 +1</em></li>
+          <li><b>Keep a running count</b><span>Add the tags as the cards come out.</span><em>+2</em></li>
+          <li><b>Convert and bet</b><span>Divide by decks left. Bet more when it's high.</span><em>÷ decks</em></li>
+        </ol>
+        <p class="method-v">A positive count means more tens and aces are left in the shoe, which is good for you.</p></div>`),
+      h(`<div class="stack"><h3>What's inside</h3><ol class="home-list">${L.filter(l => l.blurb).map((l,i) => `<li><a href="#${l.id}"><span class="no">${i+1}</span><span><strong>${l.title}</strong><small>${l.blurb}</small></span></a></li>`).join('')}
+        <li><a href="#practice"><span class="no">→</span><span><strong>Practice</strong><small>Count down a deck against the clock, count full table rounds, and convert to true counts.</small></span></a></li>
+        <li><a href="#before-you-play"><span class="no">!</span><span><strong>Before you play</strong><small>Legality, getting backed off, games where counting fails, and playing responsibly.</small></span></a></li></ol></div>`),
+      h(`<div class="faq"><h3>Questions</h3>
+        <details><summary>Is card counting illegal?</summary><p>Counting in your head is legal in most places. Using a device to count is not, and casinos can ask counters to leave. <a href="#before-you-play">Before you play</a> has the details.</p></details>
+        <details><summary>Do I need to memorise every card?</summary><p>No. You keep one number in your head and add +1, 0 or −1 for each card you see.</p></details>
+        <details><summary>Does this work for poker?</summary><p>No. Poker reshuffles a single deck every hand, so there's nothing to track between hands. In poker the useful skill is counting outs.</p></details>
+        <details><summary>Will this make me rich?</summary><p>Very unlikely. A skilled counter's edge is around 1% at best, with big swings along the way. Treat this as a skill to learn, not an income.</p></details></div>`)
+    );
+  }
+  function route(){
+    const id = location.hash.slice(1);
+    main.innerHTML = '';
+    const idx = L.findIndex(l => l.id === id);
+    if (idx < 0){ renderHome(); drawToc('home'); }
+    else {
+      const i = idx, l = L[i];
+      main.append(h(`<p class="kicker">${l.id === 'practice' ? 'Drill' : l.id === 'before-you-play' ? 'Read this' : `Lesson ${i+1} of ${LESSONS}`}</p>`), h(`<h2>${l.title}</h2>`));
+      l.render(main);
+      const prev = i > 0 ? L[i-1] : {id:'home', title:'Introduction'}, next = L[i+1];
+      main.append(h(`<nav class="pager" aria-label="Lesson navigation"><a href="#${prev.id}"><small>← Previous</small><span>${prev.title}</span></a>${next ? `<a class="nx" href="#${next.id}"><small>Next →</small><span>${next.title}</span></a>` : ''}</nav>`));
+      const nx = main.querySelector('.pager .nx');
+      if (nx) nx.addEventListener('click', () => { prog.done[l.id] = 1; save(); });
+      drawToc(l.id);
+    }
+    [...main.children].forEach((c, k) => { c.style.setProperty('--i', Math.min(k, 8)); c.classList.add('enter'); });
+    window.scrollTo({top:0});
+  }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>

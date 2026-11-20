@@ -1,0 +1,1013 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Outs & Odds: a free, interactive course on counting outs, the rule of 4 and 2, and pot odds in Texas Hold'em.">
+<style>:root{color-scheme:light; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+<title>Outs & Odds Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a course book. Contents column on the left, one lesson at a time on the right, flat felt boxes for the hands. */
+:root{
+  --bg:#f3f3f0; --paper:#ffffff; --line:#d6d7d2; --line-2:#e6e7e3; --ink:#141614; --muted:#5f625d;
+  --felt:#0e5a3d; --felt-ink:#eef5f1; --felt-muted:#9fc4b2;
+  --red:#b8132e; --red-ink:#ffffff; --red-soft:#f8e3e6;
+  --good:#17784a; --good-soft:#e1f1e8; --bad:#b8132e; --bad-soft:#f8e3e6; --warn:#8a5d00; --warn-soft:#f6ecd4;
+  --card:#fcfcfa; --card-line:#cfd1cc;
+  --s:#161616; --h:#c41a2c; --d:#1d5fbf; --c:#16823a;
+  --f-head:"Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#111312; --paper:#181b19; --line:#2c312e; --line-2:#222724; --ink:#e7eae6; --muted:#979d98;
+  --felt:#0d4a33; --felt-ink:#e8f2ec; --felt-muted:#8db7a2;
+  --red:#e0485d; --red-ink:#1a0306; --red-soft:#35161b;
+  --good:#4cc488; --good-soft:#15291f; --bad:#ef6b7c; --bad-soft:#35161b; --warn:#e8b450; --warn-soft:#2f2611;
+  --card:#f1f1ec; --card-line:#c5c7c1; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#111312; --paper:#181b19; --line:#2c312e; --line-2:#222724; --ink:#e7eae6; --muted:#979d98;
+  --felt:#0d4a33; --felt-ink:#e8f2ec; --felt-muted:#8db7a2;
+  --red:#e0485d; --red-ink:#1a0306; --red-soft:#35161b;
+  --good:#4cc488; --good-soft:#15291f; --bad:#ef6b7c; --bad-soft:#35161b; --warn:#e8b450; --warn-soft:#2f2611;
+  --card:#f1f1ec; --card-line:#c5c7c1; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 56px}
+button{font:inherit; color:inherit; cursor:pointer}
+:focus-visible{outline:2px solid var(--red); outline-offset:2px}
+a{color:inherit}
+
+.mast{max-width:1100px; margin:0 auto; display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap;
+  padding-block:22px 18px; border-bottom:2px solid var(--ink)}
+.mast h1{font-family:var(--f-head); font-stretch:118%; font-weight:850; font-size:1.65rem; line-height:1; margin:0; letter-spacing:-.01em}
+.mast h1 span{color:var(--red)}
+.mast p{margin:0; color:var(--muted); font-size:.9rem}
+
+.wrap{max-width:1100px; margin:0 auto; display:grid; grid-template-columns:230px minmax(0,1fr); gap:48px; padding-top:28px}
+@media (max-width:860px){ .wrap{grid-template-columns:minmax(0,1fr); gap:20px; padding-top:16px} }
+
+/* contents */
+.toc{position:sticky; top:20px; align-self:start}
+.toc h2{font-family:var(--f-head); font-stretch:110%; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; font-weight:700}
+.toc ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column}
+.toc a{display:grid; grid-template-columns:26px 1fr; gap:4px; padding:7px 0; text-decoration:none; color:var(--muted); font-size:.92rem; border-top:1px solid var(--line-2)}
+.toc a .no{font-family:var(--f-mono); font-size:.8rem; padding-top:2px}
+.toc a:hover{color:var(--ink)}
+.toc a[aria-current="page"]{color:var(--ink); font-weight:600}
+.toc a[aria-current="page"] .no{color:var(--red)}
+.toc a.done .no::after{content:" ✓"; color:var(--good)}
+@media (max-width:860px){
+  .toc{position:static}
+  .toc ol{flex-direction:row; overflow-x:auto; gap:6px; padding-bottom:6px; scrollbar-width:thin}
+  .toc li{flex:none}
+  .toc a{display:flex; border:1px solid var(--line); background:var(--paper); padding:6px 10px; border-radius:3px; white-space:nowrap}
+  .toc a[aria-current="page"]{border-color:var(--ink)}
+}
+
+/* lesson */
+.lesson{max-width:720px; display:flex; flex-direction:column; gap:22px; min-width:0}
+.kicker{font-family:var(--f-mono); font-size:.8rem; color:var(--red); margin:0}
+.lesson h2{font-family:var(--f-head); font-stretch:112%; font-weight:800; font-size:clamp(1.7rem, 4vw, 2.35rem); line-height:1.08; margin:-12px 0 0; text-wrap:balance; letter-spacing:-.015em}
+.lesson h3{font-family:var(--f-head); font-stretch:105%; font-weight:700; font-size:1.15rem; margin:0}
+.lesson p{margin:0; max-width:64ch}
+.lead{font-size:1.1rem; color:var(--ink)}
+.muted{color:var(--muted)}
+.stack{display:flex; flex-direction:column; gap:12px}
+strong{font-weight:600}
+.n{font-family:var(--f-mono); font-variant-numeric:tabular-nums; font-size:.92em}
+
+.note{border-top:2px solid var(--ink); padding-top:12px; display:flex; flex-direction:column; gap:6px}
+.note b{font-family:var(--f-head); font-stretch:110%; font-size:.75rem; letter-spacing:.14em; text-transform:uppercase}
+
+/* felt */
+.felt{background:var(--felt); color:var(--felt-ink); border-radius:4px; padding:18px 20px; display:flex; gap:28px; flex-wrap:wrap; align-items:flex-end}
+.felt .grp{display:flex; flex-direction:column; gap:8px}
+.lbl{font-family:var(--f-head); font-stretch:110%; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--felt-muted); font-weight:700}
+.cards{display:flex; gap:7px}
+.potline{margin-left:auto; font-family:var(--f-mono); font-size:.9rem; text-align:right; display:flex; flex-direction:column; gap:2px}
+.potline b{font-weight:600; color:#fff}
+@media (max-width:520px){ .potline{margin-left:0; text-align:left} .felt{gap:18px} }
+
+/* playing card: corner index + center pip */
+.card{width:56px; height:80px; border-radius:6px; position:relative; flex:none}
+.card-in{position:absolute; inset:0; transform-style:preserve-3d}
+.face{position:absolute; inset:0; border-radius:6px; -webkit-backface-visibility:hidden; backface-visibility:hidden}
+.front{background:var(--card); border:1px solid var(--card-line); box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.back{transform:rotateY(180deg); border:3px solid #f4f4ef; box-shadow:0 1px 0 rgba(0,0,0,.25);
+  background:repeating-linear-gradient(45deg, #a3122a 0 4px, #8a0f22 4px 8px)}
+.card .ix{position:absolute; top:5px; left:6px; display:flex; flex-direction:column; align-items:center; line-height:.95}
+.card .ix i{font-style:normal; font-family:var(--f-head); font-stretch:90%; font-weight:800; font-size:1.05rem}
+.card .ix u{text-decoration:none; font-size:.8rem}
+.card .pip{position:absolute; right:7px; bottom:4px; font-size:1.75rem; line-height:1}
+.card.slot{background:transparent; border:1px dashed rgba(255,255,255,.25); box-shadow:none}
+
+/* sliders */
+.sl{display:flex; flex-direction:column; gap:4px}
+.sl-head{display:flex; justify-content:space-between; align-items:center; gap:12px}
+.sl-head label{font-weight:600; font-size:.92rem}
+.stepper{display:inline-flex; align-items:stretch; border:1px solid var(--line); border-radius:3px; overflow:hidden; background:var(--paper)}
+.stepper button{width:34px; border:0; background:transparent; font-size:1.05rem; line-height:1; color:var(--muted); transition:background-color .15s, color .15s}
+.stepper button:hover{background:var(--line-2); color:var(--ink)}
+.stepper button:active{background:var(--line)}
+.stepper output{min-width:66px; text-align:center; font:600 1rem/34px var(--f-mono); padding:0 8px; border-inline:1px solid var(--line); font-variant-numeric:tabular-nums}
+.sl-track{position:relative; padding-bottom:18px}
+.rng{-webkit-appearance:none; appearance:none; display:block; width:100%; height:30px; background:transparent; margin:0; --p:50%; cursor:pointer}
+.rng::-webkit-slider-runnable-track{height:6px; border-radius:3px; background:linear-gradient(to right, var(--red) 0 var(--p), var(--line) var(--p) 100%)}
+.rng::-moz-range-track{height:6px; border-radius:3px; background:var(--line)}
+.rng::-moz-range-progress{height:6px; border-radius:3px; background:var(--red)}
+.rng::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px; margin-top:-8px; border-radius:50%; background:var(--paper); border:2px solid var(--red);
+  box-shadow:0 1px 4px rgba(0,0,0,.28); transition:transform .15s var(--ease-spring), box-shadow .15s}
+.rng::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--paper); border:2px solid var(--red); box-shadow:0 1px 4px rgba(0,0,0,.28); transition:transform .15s var(--ease-spring), box-shadow .15s}
+.rng:hover::-webkit-slider-thumb{transform:scale(1.1)}
+.rng:hover::-moz-range-thumb{transform:scale(1.1)}
+.rng:active::-webkit-slider-thumb{transform:scale(1.2); box-shadow:0 0 0 7px var(--red-soft)}
+.rng:active::-moz-range-thumb{transform:scale(1.2); box-shadow:0 0 0 7px var(--red-soft)}
+.rng:focus{outline:none}
+.rng:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--red)}
+.rng:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px var(--paper), 0 0 0 5px var(--red)}
+.ticks{position:absolute; left:0; right:0; bottom:0; height:14px}
+.ticks span{position:absolute; left:calc(var(--t) * (100% - 22px) + 11px); transform:translateX(-50%); font:500 .68rem var(--f-mono); color:var(--muted); white-space:nowrap}
+.ticks span::before{content:""; position:absolute; left:50%; top:-5px; width:1px; height:4px; background:var(--line)}
+
+/* rule vs exact bars */
+.cmp{display:flex; flex-direction:column; gap:10px}
+.cmp-row{display:grid; grid-template-columns:78px minmax(0,1fr) 66px; gap:12px; align-items:center}
+.cmp-k{font-size:.85rem; color:var(--muted)}
+.cmp-row b{font-family:var(--f-head); font-weight:800; font-size:1.2rem; text-align:right; font-variant-numeric:tabular-nums}
+.trk{height:16px; background:var(--line-2); border-radius:2px; position:relative; overflow:hidden}
+.trk::after{content:""; position:absolute; inset:0; background:linear-gradient(to right, transparent calc(25% - 1px), var(--line) 0 25%, transparent 0 calc(50% - 1px), var(--line) 0 50%, transparent 0 calc(75% - 1px), var(--line) 0 75%, transparent 0); pointer-events:none}
+.fill{position:absolute; top:0; bottom:0; left:0; background:var(--muted); transition:width .35s var(--ease-out); z-index:1}
+.fill.ex{background:var(--red)}
+.axis-t{position:relative; height:14px; font:500 .68rem var(--f-mono); color:var(--muted)}
+.axis-t span{position:absolute; transform:translateX(-50%)}
+.cmp-sum{font-size:.9rem; color:var(--muted)}
+.cmp-sum b{color:var(--ink); font-family:var(--f-mono); font-weight:600}
+@media (max-width:420px){ .cmp-row{grid-template-columns:62px minmax(0,1fr) 56px; gap:8px} }
+
+/* home */
+.home-link{text-decoration:none}
+.home-h{font-size:clamp(2.1rem, 6vw, 3.4rem) !important; max-width:16ch}
+.home-ex{display:flex; flex-direction:column; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:var(--paper)}
+.home-ex .felt{border-radius:0}
+.method{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); border-bottom:1px solid var(--line)}
+.method li{padding:14px 16px; display:flex; flex-direction:column; gap:4px; border-right:1px solid var(--line); counter-increment:m}
+.method li:last-child{border-right:0}
+.method li b::before{content:counter(m) ". "; color:var(--red); font-family:var(--f-mono)}
+.method li b{font-size:.92rem}
+.method li span{font-size:.85rem; color:var(--muted)}
+.method li em{font-style:normal; font-family:var(--f-head); font-weight:800; font-size:1.35rem; margin-top:auto}
+.method-v{padding:12px 16px; font-size:.92rem}
+@media (max-width:620px){ .method{grid-template-columns:minmax(0,1fr)} .method li{border-right:0; border-bottom:1px solid var(--line)} .method li:last-child{border-bottom:0} }
+.home-list{list-style:none; margin:0; padding:0}
+.home-list a{display:grid; grid-template-columns:28px 1fr; gap:6px; padding:12px 0; border-top:1px solid var(--line-2); text-decoration:none}
+.home-list a .no{font-family:var(--f-mono); color:var(--red); font-size:.85rem; padding-top:2px}
+.home-list a span:last-child{display:flex; flex-direction:column}
+.home-list a small{color:var(--muted); font-size:.88rem}
+.home-list a:hover strong{text-decoration:underline; text-underline-offset:3px}
+a.btn{text-decoration:none; display:inline-block}
+.faq{display:flex; flex-direction:column; gap:0}
+.faq h3{margin-bottom:8px}
+.faq details{border-top:1px solid var(--line-2); padding:12px 0}
+.faq summary{cursor:pointer; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+"; font-family:var(--f-mono); color:var(--muted); transition:transform .2s var(--ease-out)}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{margin-top:8px; color:var(--muted)}
+.faq details[open] p{animation:rise .3s var(--ease-out) both}
+
+/* simulator */
+.sim-chart{width:100%; height:190px; display:block}
+.sim-msg{min-height:1.6em; margin:0}
+.ro{display:contents}
+.tabs{overflow-x:auto; scrollbar-width:none}
+.tabs button{white-space:nowrap}
+
+/* before you play */
+.warn-list{margin:0; padding-left:1.2em; display:flex; flex-direction:column; gap:10px; max-width:64ch}
+.caution{border:1.5px solid var(--warn); background:var(--warn-soft); border-radius:4px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.caution b{font-family:var(--f-head); font-stretch:110%; font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--warn)}
+.faq details a{color:var(--ink); text-underline-offset:3px}
+
+/* ---------- motion ---------- */
+:root{ --ease-out:cubic-bezier(.16,1,.3,1); --ease-spring:cubic-bezier(.34,1.56,.64,1) }
+.cards{perspective:800px}
+.card:not(.slot){animation:slide-in .42s var(--ease-out) both; animation-delay:calc(var(--i,0) * 80ms)}
+.card:not(.slot) .card-in{animation:flip .55s cubic-bezier(.45,.05,.25,1) both; animation-delay:calc(var(--i,0) * 80ms + 260ms)}
+@keyframes slide-in{from{transform:translate(-36px,-22px) rotate(-6deg); opacity:0} 50%{opacity:1}}
+@keyframes flip{
+  0%{transform:rotateY(180deg)}
+  50%{transform:rotateY(90deg) translateZ(14px)}
+  100%{transform:rotateY(0deg)}
+}
+.card.still, .card.still .card-in{animation:none}
+.slot{animation:fade .4s ease both}
+
+.enter{animation:rise .5s var(--ease-out) both; animation-delay:calc(var(--i,0) * 55ms)}
+@keyframes rise{from{opacity:0; transform:translateY(14px)}}
+@keyframes fade{from{opacity:0}}
+.swap > *{animation:rise .38s var(--ease-out) both}
+.swap > *:nth-child(2){animation-delay:40ms} .swap > *:nth-child(3){animation-delay:80ms} .swap > *:nth-child(4){animation-delay:120ms} .swap > *:nth-child(n+5){animation-delay:160ms}
+
+.fb{animation:slidein .42s var(--ease-out) both}
+@keyframes slidein{from{opacity:0; transform:translateX(-10px); border-left-width:0}}
+
+.cell{transition:background-color .15s, color .15s, border-color .15s, transform .15s var(--ease-spring)}
+.cell:hover:not(:disabled){transform:translateY(-2px)}
+.cell.tap{animation:tap .28s var(--ease-spring)}
+@keyframes tap{50%{transform:scale(1.18)}}
+.cell.rev{animation:reveal .45s var(--ease-spring) both; animation-delay:var(--d,0ms)}
+.cell.wrong.rev{animation:reveal .45s var(--ease-spring) both, shake .4s ease var(--d2,0ms)}
+@keyframes reveal{0%{transform:scale(.6) rotateX(90deg); opacity:.2} 100%{transform:none; opacity:1}}
+@keyframes shake{20%,60%{transform:translateX(-3px)} 40%,80%{transform:translateX(3px)}}
+
+.opt{transition:border-color .15s, background-color .15s, transform .15s var(--ease-spring)}
+.opt:hover:not(:disabled){transform:translateY(-2px)}
+.opt.right{animation:pop .5s var(--ease-spring)}
+.opt.wrong{animation:shake .42s ease}
+@keyframes pop{40%{transform:scale(1.06)}}
+.btn{transition:transform .15s var(--ease-spring), background-color .15s, opacity .15s}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.meter span{transition:width .35s var(--ease-out)}
+.potbar div{transition:flex-grow .35s var(--ease-out)}
+.readout .v{transition:color .2s}
+.stats b{display:inline-block}
+.stats b.bump{animation:bump .5s var(--ease-spring)}
+@keyframes bump{40%{transform:scale(1.35); color:var(--red)}}
+.pager a small{transition:transform .2s var(--ease-out); display:inline-block}
+.pager a:not(.nx):hover small{transform:translateX(-4px)}
+.pager a.nx:hover small{transform:translateX(4px)}
+.toc a{transition:color .15s}
+.tabs button{transition:color .15s, border-color .2s}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+}
+.suit-s{color:var(--s)} .suit-h{color:var(--h)} .suit-d{color:var(--d)} .suit-c{color:var(--c)}
+@media (max-width:420px){ .card{width:48px; height:69px} .card .pip{font-size:1.45rem} .cards{gap:5px} }
+
+/* deck picker */
+.deck{display:grid; grid-template-columns:24px repeat(13, minmax(0,1fr)); gap:3px}
+.deck .rh{font-family:var(--f-mono); font-size:.7rem; color:var(--muted); text-align:center}
+.deck .sh{display:grid; place-items:center; font-size:1rem}
+.cell{height:34px; border:1px solid var(--line); background:var(--paper); border-radius:3px; font-family:var(--f-mono); font-weight:600; font-size:.78rem; padding:0; min-width:0}
+.cell.suit-s{color:var(--ink)}
+.cell:hover:not(:disabled){border-color:var(--ink)}
+.cell.known{background:var(--line-2); color:var(--muted); border-color:transparent; text-decoration:line-through; cursor:default}
+.cell.sel{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.cell.hit{background:var(--good); color:#fff; border-color:var(--good)}
+.cell.miss{border:2px dashed var(--good); color:var(--good)}
+.cell.wrong{background:var(--bad-soft); color:var(--bad); border-color:var(--bad); text-decoration:line-through}
+.cell.out{background:var(--good-soft); color:var(--good); border-color:var(--good)}
+@media (max-width:420px){ .deck{grid-template-columns:18px repeat(13, minmax(0,1fr)); gap:2px} .cell{height:30px; font-size:.7rem} }
+
+.bar-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.btn{border:1.5px solid var(--ink); background:var(--ink); color:var(--paper); border-radius:3px; padding:10px 18px; font-weight:600; font-size:.95rem}
+.btn.red{background:var(--red); border-color:var(--red); color:var(--red-ink)}
+.btn.line{background:transparent; color:var(--ink)}
+.btn:disabled{opacity:.4; cursor:default}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.count{font-family:var(--f-mono); font-size:.88rem; color:var(--muted)}
+
+.fb{padding:12px 14px; border-left:4px solid; display:flex; flex-direction:column; gap:4px; font-size:.95rem}
+.fb.good{background:var(--good-soft); border-color:var(--good)}
+.fb.bad{background:var(--bad-soft); border-color:var(--bad)}
+.fb.close{background:var(--warn-soft); border-color:var(--warn)}
+.fb .h{font-weight:600}
+.fb.good .h{color:var(--good)} .fb.bad .h{color:var(--bad)} .fb.close .h{color:var(--warn)}
+.fb p{margin:0}
+.math{font-family:var(--f-mono); font-size:.86rem; font-variant-numeric:tabular-nums}
+
+.tabs{display:flex; gap:0; border-bottom:1px solid var(--line)}
+.tabs button{border:0; background:none; padding:8px 14px; font-weight:600; font-size:.92rem; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink); border-color:var(--red)}
+
+.panel{background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:20px; display:flex; flex-direction:column; gap:16px}
+.choice{display:grid; grid-template-columns:repeat(auto-fit, minmax(110px,1fr)); gap:8px}
+.opt{border:1.5px solid var(--line); background:var(--paper); border-radius:3px; padding:12px 8px; font-family:var(--f-mono); font-weight:600; font-size:1.05rem}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--good); background:var(--good-soft); color:var(--good)}
+.opt.wrong{border-color:var(--bad); background:var(--bad-soft); color:var(--bad)}
+.opt:disabled{cursor:default}
+.opt.word{font-family:var(--f-body); font-size:1rem}
+
+/* widgets */
+.slider{display:grid; grid-template-columns:90px 1fr 64px; gap:12px; align-items:center}
+.slider label{font-size:.9rem; font-weight:500}
+.slider output{font-family:var(--f-mono); text-align:right; font-weight:600}
+input[type=range]{width:100%; accent-color:var(--red)}
+.readout{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line)}
+.readout div{background:var(--paper); padding:12px 14px}
+.readout .k{font-size:.78rem; color:var(--muted)}
+.readout .v{font-family:var(--f-head); font-stretch:105%; font-weight:800; font-size:1.7rem; line-height:1.15; font-variant-numeric:tabular-nums}
+.meter{height:12px; background:var(--line-2); position:relative; border-radius:2px; overflow:hidden}
+.meter span{position:absolute; top:0; bottom:0; left:0}
+.potbar{display:flex; height:34px; border-radius:3px; overflow:hidden; font-family:var(--f-mono); font-size:.75rem; font-weight:600}
+.potbar div{display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden; min-width:0; transition:flex-grow .2s}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:.82rem; color:var(--muted)}
+.legend i{display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:-1px}
+
+table{width:100%; border-collapse:collapse; font-size:.92rem}
+th{text-align:right; font-size:.75rem; color:var(--muted); font-weight:600; padding:0 0 8px; border-bottom:2px solid var(--ink)}
+th:first-child, td:first-child{text-align:left}
+td{text-align:right; padding:8px 0; border-bottom:1px solid var(--line-2); font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto}
+
+.pager{display:flex; justify-content:space-between; gap:12px; padding-top:20px; border-top:1px solid var(--line); flex-wrap:wrap}
+.pager a{text-decoration:none; display:flex; flex-direction:column; gap:2px; max-width:48%}
+.pager a small{color:var(--muted); font-size:.8rem}
+.pager a span{font-weight:600}
+.pager a.nx{text-align:right; margin-left:auto}
+.pager a:hover span{text-decoration:underline; text-underline-offset:3px}
+
+.stats{display:flex; gap:22px; flex-wrap:wrap; font-size:.88rem; color:var(--muted)}
+.stats b{color:var(--ink); font-family:var(--f-mono); font-weight:600}
+.seg{display:inline-flex; border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.seg button{border:0; background:var(--paper); padding:6px 12px; font-size:.85rem; font-weight:500; color:var(--muted); border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--paper)}
+.num{width:96px; font:600 1.3rem var(--f-mono); padding:8px 12px; border-radius:3px; border:1.5px solid var(--line); background:var(--paper); color:var(--ink)}
+.num:focus{border-color:var(--ink); outline:none}
+.linkbtn{background:none; border:0; padding:0; color:var(--muted); text-decoration:underline; text-underline-offset:3px; font-size:.85rem}
+@media (prefers-reduced-motion: reduce){ .potbar div{transition:none} }
+
+/* game switch */
+.mast{align-items:center}
+.switch{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+.switch .all{font-size:.85rem; color:var(--muted); text-decoration:none}
+.switch .all:hover{color:var(--ink); text-decoration:underline; text-underline-offset:3px}
+.sw{display:inline-flex; border:1px solid var(--line); border-radius:3px; overflow:hidden}
+.sw a{padding:6px 14px; font-size:.88rem; font-weight:600; text-decoration:none; color:var(--muted); background:var(--paper); transition:background-color .15s, color .15s}
+.sw a:hover{color:var(--ink)}
+.sw a[aria-current]{background:var(--ink); color:var(--paper)}
+</style>
+</head>
+<body>
+<header class="mast">
+  <div>
+    <h1><a href="#home" class="home-link">Outs <span>&amp;</span> Odds</a></h1>
+    <p>A short course on drawing hands in Texas Hold'em</p>
+  </div>
+  <nav class="switch" aria-label="Games"><a class="all" href="index.html">All games</a><span class="sw"><a href="poker.html" aria-current="page">Poker</a><a href="blackjack.html">Blackjack</a></span></nav>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Lessons">
+    <h2>Contents</h2>
+    <ol id="toc"></ol>
+  </nav>
+  <main class="lesson" id="lesson" aria-live="polite"></main>
+</div>
+
+<script>
+(function(){
+  /* ---------------- cards & evaluator ---------------- */
+  const SUITS = ['s','h','d','c'];
+  const GLYPH = {s:'♠', h:'♥', d:'♦', c:'♣'};
+  const SNAME = {s:'spades', h:'hearts', d:'diamonds', c:'clubs'};
+  const RL = {2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'10',11:'J',12:'Q',13:'K',14:'A'};
+  const RN = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14};
+  const CAT = ['High card','Pair','Two pair','Three of a kind','Straight','Flush','Full house','Four of a kind','Straight flush'];
+  const DECK = []; for (const s of SUITS) for (let r = 2; r <= 14; r++) DECK.push({r, s, id: r + s});
+  const parse = str => str.trim().split(/\s+/).map(t => ({r: RN[t[0]], s: t[1], id: RN[t[0]] + t[1]}));
+
+  function straightHigh(m){ if (m & (1 << 14)) m |= 2; for (let h = 14; h >= 5; h--) if (((m >> (h-4)) & 31) === 31) return h; return 0; }
+  function score(cat, ks){ let v = cat; for (let i = 0; i < 5; i++) v = v*15 + (ks[i] || 0); return v; }
+  const BASE = Math.pow(15, 5);
+  function evaluate(cards){
+    const counts = new Array(15).fill(0), by = {s:[],h:[],d:[],c:[]}; let mask = 0;
+    for (const c of cards){ counts[c.r]++; by[c.s].push(c.r); mask |= 1 << c.r; }
+    let flush = null; for (const s of SUITS) if (by[s].length >= 5) flush = by[s].slice().sort((a,b)=>b-a);
+    if (flush){ let fm = 0; for (const r of flush) fm |= 1 << r; const sh = straightHigh(fm); if (sh) return score(8,[sh]); }
+    const ranks = []; for (let r = 14; r >= 2; r--) if (counts[r]) ranks.push(r);
+    const g = ranks.slice().sort((a,b)=>counts[b]-counts[a] || b-a);
+    const oth = ex => ranks.filter(r => !ex.includes(r));
+    if (counts[g[0]] === 4) return score(7, [g[0], oth([g[0]])[0]]);
+    if (counts[g[0]] === 3 && g[1] && counts[g[1]] >= 2) return score(6, [g[0], g[1]]);
+    if (flush) return score(5, flush.slice(0,5));
+    const sh = straightHigh(mask); if (sh) return score(4, [sh]);
+    if (counts[g[0]] === 3) return score(3, [g[0], ...oth([g[0]]).slice(0,2)]);
+    if (counts[g[0]] === 2 && counts[g[1]] === 2) return score(2, [g[0], g[1], oth([g[0],g[1]])[0]]);
+    if (counts[g[0]] === 2) return score(1, [g[0], ...oth([g[0]]).slice(0,3)]);
+    return score(0, ranks.slice(0,5));
+  }
+  const catOf = v => Math.floor(v / BASE);
+  function outsFor(hero, board){
+    const known = new Set([...hero, ...board].map(c => c.id)), outs = [];
+    for (const c of DECK){
+      if (known.has(c.id)) continue;
+      const v = evaluate([...hero, ...board, c]), cat = catOf(v);
+      if (cat < 4) continue;
+      if (board.length + 1 >= 5 && v <= evaluate([...board, c])) continue;
+      outs.push({c, cat});
+    }
+    return outs;
+  }
+  const exactEq = (o, street) => street === 'flop' ? 1 - ((47-o)*(46-o)) / (47*46) : o / 46;
+  const pct = x => (x*100).toFixed(1) + '%';
+  const rnd = n => Math.floor(Math.random()*n);
+  const shuffle = a => { for (let i = a.length-1; i > 0; i--){ const j = rnd(i+1); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+  const h = (html) => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+
+  /* ---------------- shared pieces ---------------- */
+  const cardHTML = (c, i = 0, still = false) => `<div class="card suit-${c.s}${still ? ' still' : ''}" style="--i:${i}" role="img" aria-label="${RL[c.r]} of ${SNAME[c.s]}"><div class="card-in"><div class="face front"><span class="ix"><i>${RL[c.r]}</i><u>${GLYPH[c.s]}</u></span><span class="pip">${GLYPH[c.s]}</span></div><div class="face back"></div></div></div>`;
+  function feltHTML(hero, board, pot){
+    const slots = Math.max(0, 5 - board.length);
+    return `<div class="felt">
+      <div class="grp"><span class="lbl">Your hand</span><div class="cards">${hero.map((c,i) => cardHTML(c, i)).join('')}</div></div>
+      <div class="grp"><span class="lbl">Board${board.length === 3 ? ' · flop' : board.length === 4 ? ' · turn' : ''}</span><div class="cards">${board.map((c,i) => cardHTML(c, i + 2)).join('')}${'<div class="card slot"></div>'.repeat(slots)}</div></div>
+      ${pot ? `<div class="potline"><span>Pot <b>$${pot.P}</b></span><span>Bet to you <b>$${pot.B}</b></span></div>` : ''}
+    </div>`;
+  }
+
+  // Deck picker: tap the cards you think are outs, then check.
+  function picker(hero, board, opts = {}){
+    const outs = outsFor(hero, board), outSet = new Set(outs.map(o => o.c.id));
+    const known = new Set([...hero, ...board].map(c => c.id));
+    const sel = new Set(); let checked = false, flash = null, reveal = false;
+    const root = h(`<div class="stack"></div>`);
+    function draw(){
+      let g = `<div class="deck" role="group" aria-label="All 52 cards"><span></span>`;
+      for (let r = 14; r >= 2; r--) g += `<span class="rh">${RL[r]}</span>`;
+      for (const s of SUITS){
+        g += `<span class="sh suit-${s}" style="${s==='s'?'color:var(--ink)':''}">${GLYPH[s]}</span>`;
+        for (let r = 14; r >= 2; r--){
+          const id = r + s; let cls = 'cell suit-' + s;
+          if (known.has(id)) cls += ' known';
+          else if (checked){ if (outSet.has(id) && sel.has(id)) cls += ' hit'; else if (outSet.has(id)) cls += ' miss'; else if (sel.has(id)) cls += ' wrong'; }
+          else if (sel.has(id)) cls += ' sel';
+          let sty = '';
+          if (id === flash) cls += ' tap';
+          if (reveal && !known.has(id) && (outSet.has(id) || sel.has(id))){
+            const d = (14 - r) * 28 + SUITS.indexOf(s) * 18;
+            cls += ' rev'; sty = `style="--d:${d}ms;--d2:${d + 420}ms"`;
+          }
+          g += `<button class="${cls}" ${sty} data-id="${id}" ${known.has(id) || checked ? 'disabled' : ''} aria-pressed="${sel.has(id)}" aria-label="${RL[r]} of ${SNAME[s]}">${RL[r]}</button>`;
+        }
+      }
+      g += `</div>`;
+      let foot;
+      if (!checked){
+        foot = `<div class="bar-row"><button class="btn" data-act="check" ${sel.size ? '' : 'disabled'}>Check my outs</button><span class="count">${sel.size} selected</span><button class="linkbtn" data-act="show">Show me</button></div>`;
+      } else {
+        const hit = [...sel].filter(id => outSet.has(id)).length, wrong = sel.size - hit, n = outs.length;
+        const ok = hit === n && wrong === 0;
+        foot = `<div class="fb ${ok ? 'good' : 'bad'}"><span class="h">${ok ? `All ${n} outs found.` : `You found ${hit} of ${n} outs.`}</span>
+          ${!ok ? `<p>${n - hit ? `Dashed green cards are outs you missed. ` : ''}${wrong ? `Struck-out red cards don't make a straight or better.` : ''}</p>` : ''}
+          ${opts.explain ? `<p>${opts.explain}</p>` : ''}</div>
+          <div class="bar-row"><button class="btn line" data-act="reset">Try again</button></div>`;
+        if (opts.onDone) opts.onDone(ok);
+      }
+      root.innerHTML = g + foot;
+      flash = null; reveal = false;
+    }
+    root.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.id){ sel.has(b.dataset.id) ? sel.delete(b.dataset.id) : sel.add(b.dataset.id); flash = b.dataset.id; draw(); return; }
+      if (b.dataset.act === 'check'){ checked = true; reveal = true; draw(); }
+      if (b.dataset.act === 'show'){ sel.clear(); outSet.forEach(id => sel.add(id)); checked = true; reveal = true; draw(); }
+      if (b.dataset.act === 'reset'){ sel.clear(); checked = false; draw(); }
+    });
+    draw();
+    return root;
+  }
+
+  // Call/fold worked example
+  function decision(cfg){
+    const hero = parse(cfg.hero), board = parse(cfg.board), street = board.length === 3 ? 'flop' : 'turn';
+    const n = outsFor(hero, board).length, eq = exactEq(n, street), need = cfg.B / (cfg.P + 2*cfg.B);
+    const best = eq >= need ? 'call' : 'fold', mult = street === 'flop' ? 4 : 2;
+    const root = h(`<div class="panel">
+      <h3>${cfg.title}</h3>
+      ${feltHTML(hero, board, cfg)}
+      <p>${cfg.text}</p>
+      <div class="choice"><button class="opt word" data-a="call">Call $${cfg.B}</button><button class="opt word" data-a="fold">Fold</button></div>
+      <div class="out"></div>
+    </div>`);
+    root.querySelector('.choice').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b || b.disabled) return;
+      const ok = b.dataset.a === best;
+      root.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.dataset.a === best) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
+      root.querySelector('.out').replaceWith(h(`<div class="fb ${ok ? 'good' : 'bad'}">
+        <span class="h">${ok ? `Right, this is a ${best}.` : `This one is a ${best}.`}</span>
+        <p class="math">1. Outs: ${n}</p>
+        <p class="math">2. Equity: ${n} × ${mult} ≈ ${n*mult}%  (exact ${pct(eq)})</p>
+        <p class="math">3. Needed: ${cfg.B} ÷ (${cfg.P} + ${cfg.B} + ${cfg.B}) = ${pct(need)}</p>
+        <p>${cfg.why}</p></div>`));
+    });
+    return root;
+  }
+
+  // Slider with a filled track, tick labels and +/- steppers
+  function slider({id, label, min, max, step = 1, value, fmt = v => v, ticks = [], onInput}){
+    const el = h(`<div class="sl">
+      <div class="sl-head"><label for="${id}">${label}</label>
+        <div class="stepper"><button type="button" data-d="-1" aria-label="Decrease ${label}">−</button><output for="${id}"></output><button type="button" data-d="1" aria-label="Increase ${label}">+</button></div></div>
+      <div class="sl-track"><input class="rng" id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${value}">
+        <div class="ticks" aria-hidden="true">${ticks.map(t => `<span style="--t:${(t-min)/(max-min)}">${fmt(t)}</span>`).join('')}</div></div>
+    </div>`);
+    const inp = el.querySelector('input'), out = el.querySelector('output');
+    const sync = () => { const v = +inp.value; inp.style.setProperty('--p', ((v-min)/(max-min)*100) + '%'); out.textContent = fmt(v); if (onInput) onInput(v); };
+    inp.addEventListener('input', sync);
+    el.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', () => { inp.value = Math.min(max, Math.max(min, +inp.value + (+b.dataset.d)*step)); sync(); }));
+    el.value = () => +inp.value; el.sync = sync;
+    return el;
+  }
+
+  /* ---------------- lessons ---------------- */
+  const PROG_KEY = 'outs-odds-course-v2';
+  let prog = {done:{}, mode:'mixed', st:{hands:0, outsR:0, outsT:0, eqR:0, eqT:0, decR:0, decT:0, streak:0, best:0}};
+  try { const s = JSON.parse(localStorage.getItem(PROG_KEY)); if (s && s.st) prog = Object.assign(prog, s); } catch(e){}
+  const save = () => { try { localStorage.setItem(PROG_KEY, JSON.stringify(prog)); } catch(e){} };
+
+  const L = [];
+
+  L.push({id:'outs', title:'What an out is', blurb:'A flush draw, and how to count the cards that complete it.', render(el){
+    const hero = parse('Ah Kh'), board = parse('Qh 7h 2c');
+    el.append(
+      h(`<p class="lead">Often in Hold'em you don't have a strong hand yet. You have a draw: a hand that needs one more card to become strong. An <strong>out</strong> is any card still in the deck that completes it.</p>`),
+      h(`<p>Counting outs is the first step of every drawing decision. Once you know your outs, you can work out how often you'll hit, and whether the price you're being offered is worth paying.</p>`),
+      h(feltHTML(hero, board)),
+      h(`<p>You hold the A♥ K♥, and two more hearts came on the flop. Four hearts so far. A fifth heart on the turn or river gives you the nut flush.</p>`),
+      h(`<p>There are 13 hearts in the deck and you can see 4 of them, so <span class="n">13 − 4 = 9</span> hearts are left. Those 9 cards are your outs.</p>`),
+      h(`<div class="stack"><h3>Try it</h3><p class="muted">Tap every card that gives you a straight or better. Cards already on the table are crossed out.</p></div>`),
+      picker(hero, board, {explain:'Every remaining heart makes your flush. A jack doesn\'t make a straight on its own, because you\'d still need a ten.'}),
+      h(`<div class="note"><b>Remember</b><p>Only count cards you can't see. Your two hole cards and the board cards are already out of the deck.</p></div>`)
+    );
+  }});
+
+  L.push({id:'straights', title:'Straight draws', blurb:'Open-enders, gutshots and the easy-to-miss double gutshot.', render(el){
+    const ex = {
+      oesd:{hero:'9s 8d', board:'7c 6h 2s', name:'Open-ended', text:'You have four cards in a row, 6-7-8-9, open at both ends. A ten on top or a five underneath makes the straight. Four tens plus four fives is <span class="n">8 outs</span>.'},
+      gut:{hero:'9s 8d', board:'Jc 7h 2s', name:'Gutshot', text:'You have 7-8-9 and a jack, with a gap where the ten belongs. Only a ten fills it. That\'s <span class="n">4 outs</span>, half as many as an open-ender.'},
+      dbl:{hero:'9s 7d', board:'Tc Jh Ks', name:'Double gutshot', text:'This one is easy to miss. You have 7, 9, 10, J and K. An eight makes 7-8-9-10-J, and a queen makes 9-10-J-Q-K. Two different gaps, so <span class="n">8 outs</span>, as many as an open-ender.'}
+    };
+    el.append(
+      h(`<p class="lead">A straight needs five ranks in a row. How many outs you have depends on whether your draw is open at both ends or has a gap in the middle.</p>`)
+    );
+    const tabs = h(`<div class="tabs" role="tablist">${Object.entries(ex).map(([k,v],i)=>`<button role="tab" data-k="${k}" aria-selected="${i===0}">${v.name}</button>`).join('')}</div>`);
+    const body = h(`<div class="stack"></div>`);
+    function show(k){
+      const e = ex[k], hero = parse(e.hero), board = parse(e.board);
+      tabs.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', b.dataset.k === k));
+      body.innerHTML = '';
+      body.append(h(feltHTML(hero, board)), h(`<p>${e.text}</p>`), h(`<p class="muted">Find them in the deck:</p>`), picker(hero, board));
+    }
+    tabs.addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(b.dataset.k); });
+    el.append(tabs, body);
+    show('oesd');
+    el.append(h(`<div class="note"><b>Remember</b><p>Open-ender: 8 outs. Gutshot: 4 outs. Double gutshot: 8 outs. Watch for an ace at the low end: A-2-3-4 can only be finished by a five, so it plays like a gutshot.</p></div>`));
+  }});
+
+  L.push({id:'combos', title:'Combo draws', blurb:'Flush and straight draws together, without double-counting.', render(el){
+    const hero = parse('Jh Th'), board = parse('9h 8h 2c');
+    el.append(
+      h(`<p class="lead">Sometimes you're drawing to a flush and a straight at the same time. These combo draws are among the strongest hands you can have on the flop, often a favourite even against a pair.</p>`),
+      h(feltHTML(hero, board)),
+      h(`<p>You have four hearts, so <span class="n">9</span> flush outs. You also have 8-9-10-J, an open-ender, so a queen or a seven makes a straight: <span class="n">8</span> more.</p>`),
+      h(`<p>But <span class="n">9 + 8 = 17</span> is wrong. The Q♥ and 7♥ are in both groups. They make a flush <em>and</em> a straight (a straight flush, in fact), but they're still only two cards. Count each card once: <span class="n">9 + 8 − 2 = 15</span> outs.</p>`),
+      h(`<div class="stack"><h3>Try it</h3><p class="muted">Tap all 15.</p></div>`),
+      picker(hero, board, {explain:'Nine hearts, plus the three queens and three sevens that aren\'t hearts.'}),
+      h(`<div class="note"><b>Remember</b><p>When two draws share cards, subtract the overlap. Flush + open-ender is 15 outs. Flush + gutshot is 12.</p></div>`)
+    );
+  }});
+
+  L.push({id:'made-hands', title:'Improving a made hand', blurb:'Sets and two pair drawing to a full house.', render(el){
+    const setH = parse('7s 7d'), setB = parse('7c Kh 2s');
+    const tpH = parse('As 9d'), tpB = parse('Ac 9h 4s');
+    el.append(
+      h(`<p class="lead">Outs aren't only for draws. A hand that's already good can have outs to become very hard to beat.</p>`),
+      h(`<h3>A set drawing to a full house</h3>`),
+      h(feltHTML(setH, setB)),
+      h(`<p>You flopped three sevens. If the board pairs you have a full house: three kings and three deuces are left, <span class="n">6</span> cards. The last seven gives you four of a kind. That's <span class="n">7 outs</span>.</p>`),
+      picker(setH, setB),
+      h(`<h3>Two pair drawing to a full house</h3>`),
+      h(feltHTML(tpH, tpB)),
+      h(`<p>Aces and nines. Two aces and two nines are left, so <span class="n">4 outs</span> to a full house.</p>`),
+      picker(tpH, tpB),
+      h(`<div class="note"><b>Remember</b><p>In this course an out is a card that makes a straight or better. That keeps counting clean. At the table you'll also weigh softer outs, like hitting an overcard to make top pair, but they're less reliable.</p></div>`)
+    );
+  }});
+
+  L.push({id:'rule-of-4', title:'Outs into odds', blurb:'The rule of 4 and 2, and how close it gets to the exact odds.', render(el){
+    el.append(
+      h(`<p class="lead">Knowing you have 9 outs isn't enough. You need to know how often one of them actually arrives. The quick way is the <strong>rule of 4 and 2</strong>.</p>`),
+      h(`<div class="stack">
+        <p><strong>On the flop</strong>, with the turn and river still to come, multiply your outs by 4.</p>
+        <p><strong>On the turn</strong>, with only the river to come, multiply by 2.</p>
+        <p>A flush draw on the flop: <span class="n">9 × 4 = 36%</span>. On the turn: <span class="n">9 × 2 = 18%</span>. The exact numbers are 35.0% and 19.6%, close enough to decide with.</p>
+      </div>`)
+    );
+    const w = h(`<div class="panel">
+      <h3>See how close the rule gets</h3>
+      <div class="seg" role="group" aria-label="Street"><button data-s="flop" aria-pressed="true">Flop · 2 cards to come</button><button data-s="turn" aria-pressed="false">Turn · 1 card to come</button></div>
+      <div class="cmp">
+        <div class="cmp-row"><span class="cmp-k" id="r-k">Rule of 4</span><div class="trk"><div class="fill" id="m-rule"></div></div><b id="r-v"></b></div>
+        <div class="cmp-row"><span class="cmp-k">Exact</span><div class="trk"><div class="fill ex" id="m-ex"></div></div><b id="e-v"></b></div>
+        <div class="cmp-row"><span></span><div class="axis-t"><span style="left:0;transform:none">0%</span><span style="left:25%">25%</span><span style="left:50%">50%</span><span style="left:75%">75%</span><span style="left:100%;transform:translateX(-100%)">100%</span></div><span></span></div>
+      </div>
+      <p class="cmp-sum">Odds against hitting <b id="a-v"></b> · Rule is off by <b id="d-v"></b></p>
+      <p class="muted" id="r-note"></p>
+    </div>`);
+    let st = 'flop';
+    const upd = () => {
+      const o = oS.value(), m = st === 'flop' ? 4 : 2, rule = o*m, ex = exactEq(o, st), diff = rule - ex*100;
+      w.querySelector('#r-k').textContent = `Rule of ${m}`;
+      w.querySelector('#r-v').textContent = rule + '%';
+      w.querySelector('#e-v').textContent = pct(ex);
+      w.querySelector('#a-v').textContent = ((1-ex)/ex).toFixed(1) + ' to 1';
+      w.querySelector('#d-v').textContent = (diff >= 0 ? '+' : '−') + Math.abs(diff).toFixed(1) + ' pts';
+      w.querySelector('#m-rule').style.width = Math.min(100, rule) + '%';
+      w.querySelector('#m-ex').style.width = (ex*100) + '%';
+      let note;
+      if (st === 'flop' && o > 8) note = `Above 8 outs the rule of 4 runs high. Subtract (outs − 8) to correct it: ${rule} − ${o-8} = ${rule-(o-8)}%, against an exact ${pct(ex)}.`;
+      else if (st === 'turn' && o >= 8) note = `With one card to come, ×2 runs a little low once you have lots of outs. Adding 2 gets closer: ${rule} + 2 = ${rule+2}%, against an exact ${pct(ex)}.`;
+      else note = `At ${o} out${o === 1 ? '' : 's'} the shortcut is close enough to decide with.`;
+      w.querySelector('#r-note').textContent = note;
+    };
+    const oS = slider({id:'o-slide', label:'Outs', min:1, max:21, value:9, ticks:[1,4,8,12,15,21], onInput:() => upd()});
+    w.querySelector('h3').after(oS);
+    w.querySelector('.seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; st = b.dataset.s; w.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); upd(); });
+    oS.sync();
+    const D = [['Flush + open-ender',15],['Flush + gutshot',12],['Flush draw',9],['Open-ended straight',8],['Set to full house',7],['Gutshot',4],['Two pair to full house',4]];
+    el.append(w,
+      h(`<div class="stack"><h3>Numbers worth memorising</h3><div class="tbl"><table><thead><tr><th>Draw</th><th>Outs</th><th>Flop to river</th><th>Turn to river</th></tr></thead><tbody>${D.map(([n,o])=>`<tr><td>${n}</td><td class="n">${o}</td><td class="n">${pct(exactEq(o,'flop'))}</td><td class="n">${pct(exactEq(o,'turn'))}</td></tr>`).join('')}</tbody></table></div></div>`),
+      h(`<div class="note"><b>Remember</b><p>The ×4 only applies when you'll see both the turn and the river for your money, which usually means someone is all in. If you're facing a bet on the flop and might face another on the turn, use ×2 for the card you're paying to see.</p></div>`)
+    );
+  }});
+
+  L.push({id:'pot-odds', title:'Pot odds', blurb:'How much of the final pot you\'re paying, and what that means.', render(el){
+    el.append(
+      h(`<p class="lead">Your equity tells you how often you'll win. Pot odds tell you how often you <em>need</em> to win for a call to pay off.</p>`),
+      h(`<p>Say the pot is $100 and your opponent bets $50. You call $50, and the final pot is <span class="n">100 + 50 + 50 = $200</span>. Your $50 is a quarter of that, so you need to win at least <span class="n">25%</span> of the time to break even.</p>`),
+      h(`<p class="math" style="font-size:.95rem">needed equity = your call ÷ final pot</p>`)
+    );
+    const w = h(`<div class="panel">
+      <h3>Move the bet and watch the price change</h3>
+      <div class="potbar" id="pbar"><div id="pb-pot" style="background:var(--line-2);color:var(--muted)"></div><div id="pb-bet" style="background:var(--muted);color:var(--paper)"></div><div id="pb-call" style="background:var(--red);color:var(--red-ink)"></div></div>
+      <div class="legend"><span><i style="background:var(--line-2);border:1px solid var(--line)"></i>Pot before the bet</span><span><i style="background:var(--muted)"></i>Their bet</span><span><i style="background:var(--red)"></i>Your call</span></div>
+      <div class="readout"><div><div class="k">You need to win</div><div class="v" id="need"></div></div><div><div class="k">Bet size</div><div class="v" id="bs"></div></div><div><div class="k">Outs needed, turn</div><div class="v" id="on"></div></div></div>
+    </div>`);
+    const money = v => '$' + v;
+    const upd = () => {
+      const P = pS.value(), B = bS.value(), need = B/(P+2*B);
+      w.querySelector('#pb-pot').style.flexGrow = P; w.querySelector('#pb-bet').style.flexGrow = B; w.querySelector('#pb-call').style.flexGrow = B;
+      w.querySelector('#pb-pot').textContent = '$' + P; w.querySelector('#pb-bet').textContent = '$' + B; w.querySelector('#pb-call').textContent = '$' + B;
+      w.querySelector('#need').textContent = pct(need);
+      w.querySelector('#bs').textContent = Math.round(100*B/P) + '% of pot';
+      const on = Math.ceil(need*46 - 1e-9);
+      w.querySelector('#on').textContent = on > 46 ? '–' : on;
+    };
+    const pS = slider({id:'p-slide', label:'Pot', min:20, max:400, step:10, value:100, fmt:money, ticks:[20,100,200,300,400], onInput:() => upd()});
+    const bS = slider({id:'b-slide', label:'Their bet', min:10, max:400, step:5, value:50, fmt:money, ticks:[10,100,200,300,400], onInput:() => upd()});
+    w.querySelector('h3').after(pS, bS);
+    pS.sync(); bS.sync();
+    el.append(w,
+      h(`<div class="stack"><h3>Bet sizes you'll see often</h3><div class="tbl"><table><thead><tr><th>Bet</th><th>You need</th></tr></thead><tbody>
+        ${[['A third of the pot',1/3],['Half the pot',1/2],['Two thirds of the pot',2/3],['Pot-sized',1],['Twice the pot',2]].map(([n,f])=>`<tr><td>${n}</td><td class="n">${pct(f/(1+2*f))}</td></tr>`).join('')}
+      </tbody></table></div></div>`),
+      h(`<div class="note"><b>Remember</b><p>Bigger bets charge you more. Against a pot-sized bet you need 33%, which a flush draw with one card to come doesn't have.</p></div>`)
+    );
+  }});
+
+  L.push({id:'decisions', title:'Call or fold', blurb:'Three worked hands that put the whole method together.', render(el){
+    el.append(
+      h(`<p class="lead">Now put the three steps together. Count your outs, turn them into equity, compare with the price. If your equity is higher, call. If it's lower, fold.</p>`),
+      decision({title:'Example 1: a flush draw on the turn', hero:'Ah Kh', board:'Qh 7h 2c 5d', P:100, B:50,
+        text:'Your opponent bets $50 into $100. One card to come. What do you do?',
+        why:'You need 25% and you have about 20%. Calling here loses money over time, even though you\'ll sometimes hit.'}),
+      decision({title:'Example 2: a monster draw facing a shove', hero:'Jh Th', board:'9h 8h 2c', P:100, B:100,
+        text:'On the flop your opponent moves all in for $100 into a $100 pot. You\'ll see both the turn and river.',
+        why:'You need 33% and you have about 54%. Against one pair, 15 outs make you the favourite. Even against a set you\'d still have around 40%, so this is a call either way.'}),
+      decision({title:'Example 3: a gutshot facing a small bet', hero:'9s 8d', board:'Jc 7h 2s 3d', P:120, B:30,
+        text:'On the turn your opponent bets $30 into $120. You have a gutshot.',
+        why:'You need about 17% and you have under 9%. Small bets are tempting, but 4 outs with one card to go almost never gets there.'}),
+      h(`<div class="note"><b>Remember</b><p>Outs, equity, price. Run those three steps every time you're drawing.</p><p>One caution: this assumes every out wins. If an out could also give your opponent a better hand, like a flush card that pairs the board when they have a set, it's a dirty out. Count it as half, or not at all.</p></div>`)
+    );
+  }});
+
+  L.push({id:'practice', title:'Practice', render(el){ practice(el); }});
+  L.push({id:'simulator', title:'Simulator', render(el){ simulator(el); }});
+  L.push({id:'before-you-play', title:'Before you play', render(el){
+    el.append(
+      h(`<p class="lead">The math in this course is sound, but a real table adds things a lesson can't. Read this before you put money behind it.</p>`),
+      h(`<div class="stack"><h3>Do casinos use more decks?</h3>
+        <p>Not for poker. Every hand of Hold'em, live or online, is dealt from a single 52-card deck that's reshuffled before the next hand. Many card rooms rotate two decks with different coloured backs so one can be shuffled while the other is in play, but only one is ever used for a hand. That's why the course counts 47 unseen cards on the flop and 46 on the turn.</p>
+        <p>Blackjack is different. Casinos deal it from a shoe of several decks and play through most of the shoe before reshuffling. That's what makes blackjack card counting possible, and it's why more decks make it harder. None of that carries over to poker.</p></div>`),
+      h(`<div class="tbl"><table><thead><tr><th>Game</th><th>Decks per hand</th><th>Reshuffled</th><th>Does tracking past cards help?</th></tr></thead><tbody>
+        <tr><td>Hold'em, live</td><td>1</td><td>Every hand</td><td>No. Count outs instead.</td></tr>
+        <tr><td>Hold'em, online</td><td>1</td><td>Every hand</td><td>No. Count outs instead.</td></tr>
+        <tr><td>Blackjack, casino</td><td>Usually 6 to 8</td><td>When the cut card comes out</td><td>Yes, in theory</td></tr>
+      </tbody></table></div>`),
+      h(`<div class="stack"><h3>What about cards you can't see?</h3>
+        <p>Your opponents' cards, the burn cards and folded hands are all out of the deck, but you don't know what they are. Unknown cards don't change your odds: an out is as likely to be sitting in someone's folded hand as anywhere else, so you still count from the 47 or 46 cards you haven't seen.</p></div>`),
+      h(`<div class="stack"><h3>Where the numbers can mislead you</h3>
+        <ul class="warn-list">
+          <li><strong>Dirty outs.</strong> An out only counts if it wins. If your flush card also pairs the board when your opponent has a set, they make a full house and you lose.</li>
+          <li><strong>You might already be drawing dead.</strong> If your opponent holds a bigger flush draw or a hand that beats yours, some or all of your outs are worthless.</li>
+          <li><strong>The rule of 4 needs both cards.</strong> It only applies when you'll see the turn and river for one price, usually because someone is all in. Facing a flop bet with more betting to come, use × 2.</li>
+          <li><strong>This course leaves out implied odds.</strong> Real players also think about money they could win on later streets. That can justify some calls that pot odds alone say are folds, and it's a skill that comes after this one.</li>
+          <li><strong>Short-term results lie.</strong> A correct call loses often. A 35% draw misses almost two times in three. Judge your decisions, not the last hand.</li>
+        </ul></div>`),
+      h(`<div class="stack"><h3>At the table</h3>
+        <p>Use this to practise away from the game. Most card rooms don't allow phones or other devices to be used during a hand, and most online poker sites ban software that gives advice while you play. Breaking those rules can get you removed or your account closed.</p></div>`),
+      h(`<div class="caution"><b>Gambling involves real risk</b>
+        <p>Knowing the odds makes you a better player. It doesn't guarantee you'll win, and over a short stretch luck can beat skill. Only play with money you can afford to lose, check the legal age where you live (usually 18 or 21), and set a limit before you sit down.</p>
+        <p>If gambling stops being fun, help is free and confidential. In the US, call or text <strong class="n">1-800-GAMBLER</strong>. Elsewhere, search for your country's gambling helpline.</p></div>`)
+    );
+  }});
+
+  /* ---------------- runout simulator ---------------- */
+  function simulator(el){
+    const PRE = [
+      {k:'flush', name:'Flush draw', hero:'Ah Kh', board:'Qh 7h 2c'},
+      {k:'oesd', name:'Open-ender', hero:'9s 8d', board:'7c 6h 2s'},
+      {k:'gut', name:'Gutshot', hero:'9s 8d', board:'Jc 7h 2s'},
+      {k:'combo', name:'Combo draw', hero:'Jh Th', board:'9h 8h 2c'},
+      {k:'set', name:'Set', hero:'7s 7d', board:'7c Kh 2s'},
+      {k:'random', name:'Random'}
+    ];
+    el.append(h(`<p class="lead">The odds in this course are exact, but it helps to see them happen. Pick a draw on the flop, then deal the rest of the board over and over. A hit means at least one of your outs arrived.</p>`));
+    const w = h(`<div class="panel">
+      <div class="tabs" role="tablist">${PRE.map((p,i) => `<button role="tab" data-k="${p.k}" aria-selected="${i===0}">${p.name}</button>`).join('')}</div>
+      <div class="sim-felt"></div>
+      <div class="seg" role="group" aria-label="How far to deal"><button data-to="2" aria-pressed="true">Deal turn and river</button><button data-to="1" aria-pressed="false">Deal the turn only</button></div>
+      <div class="bar-row">
+        <button class="btn" data-run="1">Deal once</button>
+        <button class="btn line" data-run="100">Run 100</button>
+        <button class="btn line" data-run="1000">Run 1,000</button>
+        <button class="linkbtn" data-run="reset">Reset</button>
+      </div>
+      <p class="sim-msg muted" aria-live="polite">Nothing dealt yet.</p>
+      <div class="readout"><div><div class="k">Runouts</div><div class="v" id="sv-n">0</div></div><div><div class="k">Hit rate</div><div class="v" id="sv-r">–</div></div><div><div class="k">Exact</div><div class="v" id="sv-e"></div></div><div><div class="k" id="sv-rk">Rule of 4</div><div class="v" id="sv-q"></div></div></div>
+      <div class="stack" style="gap:6px">
+        <canvas class="sim-chart" height="190" aria-label="Running hit rate compared with the exact odds"></canvas>
+        <div class="legend"><span><i style="background:var(--ink)"></i>Your running hit rate</span><span><i style="background:var(--red)"></i>Exact odds</span></div>
+      </div>
+    </div>`);
+    el.append(w, h(`<div class="note"><b>Remember</b><p>Early on the hit rate swings wildly, and that's normal. A 35% flush draw misses five times in a row about 12% of the time. Good calls are judged over hundreds of hands, not the last one.</p></div>`));
+
+    let hero, board, outSet, n, to = 2, runs = 0, hits = 0, series = [], busy = false;
+    const felt = w.querySelector('.sim-felt'), msg = w.querySelector('.sim-msg'), cv = w.querySelector('canvas');
+    const exact = () => to === 2 ? 1 - ((47-n)*(46-n)) / (47*46) : n / 47;
+
+    function load(k){
+      const p = PRE.find(x => x.k === k);
+      if (k === 'random'){ const r = makeHand('flop'); hero = r.hero; board = r.board; }
+      else { hero = parse(p.hero); board = parse(p.board); }
+      const outs = outsFor(hero, board); n = outs.length; outSet = new Set(outs.map(o => o.c.id));
+      felt.innerHTML = `<div class="felt">
+        <div class="grp"><span class="lbl">Your hand</span><div class="cards">${hero.map((c,i) => cardHTML(c, i)).join('')}</div></div>
+        <div class="grp"><span class="lbl">Board</span><div class="cards">${board.map((c,i) => cardHTML(c, i+2)).join('')}<span class="ro cards"><div class="card slot"></div><div class="card slot"></div></span></div></div>
+        <div class="potline"><span><b>${n}</b> outs</span><span>${outs.length ? '' : 'no outs'}</span></div></div>`;
+      reset();
+    }
+    function reset(){ runs = 0; hits = 0; series = []; msg.textContent = 'Nothing dealt yet.'; felt.querySelector('.ro').innerHTML = '<div class="card slot"></div><div class="card slot"></div>'; stats(); draw(); }
+    function dealOne(){
+      const known = new Set([...hero, ...board].map(c => c.id)), pool = DECK.filter(c => !known.has(c.id));
+      const a = pool[rnd(pool.length)]; let b = null;
+      if (to === 2){ do { b = pool[rnd(pool.length)]; } while (b.id === a.id); }
+      const ro = b ? [a, b] : [a];
+      const hit = ro.some(c => outSet.has(c.id));
+      runs++; if (hit) hits++; series.push(hits / runs);
+      return {ro, hit};
+    }
+    function showRunout({ro, hit}){
+      felt.querySelector('.ro').innerHTML = ro.map((c,i) => cardHTML(c, i)).join('') + (ro.length < 2 ? '<div class="card slot"></div>' : '');
+      const got = ro.filter(c => outSet.has(c.id));
+      msg.innerHTML = hit ? `<strong style="color:var(--good)">Hit.</strong> ${got.map(c => RL[c.r] + GLYPH[c.s]).join(' and ')} ${got.length > 1 ? 'are outs' : 'is one of your outs'}.` : `<strong>Missed.</strong> ${ro.map(c => RL[c.r] + GLYPH[c.s]).join(' and ')} ${ro.length > 1 ? "don't" : "doesn't"} help.`;
+    }
+    function stats(){
+      w.querySelector('#sv-n').textContent = runs.toLocaleString();
+      w.querySelector('#sv-r').textContent = runs ? pct(hits / runs) : '–';
+      w.querySelector('#sv-e').textContent = pct(exact());
+      w.querySelector('#sv-rk').textContent = `Rule of ${to === 2 ? 4 : 2}`;
+      w.querySelector('#sv-q').textContent = Math.min(99, n * (to === 2 ? 4 : 2)) + '%';
+    }
+    function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+    function draw(){
+      const dpr = window.devicePixelRatio || 1, W = cv.clientWidth || 600, H = 190;
+      cv.width = W * dpr; cv.height = H * dpr;
+      const x = cv.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, W, H);
+      const L = 36, R = 10, T = 10, B = 22, iw = W - L - R, ih = H - T - B;
+      const Y = v => T + ih * (1 - v);
+      x.font = '11px "IBM Plex Mono", monospace'; x.textBaseline = 'middle';
+      for (const v of [0, .25, .5, .75, 1]){
+        x.strokeStyle = tok('--line-2'); x.lineWidth = 1; x.beginPath(); x.moveTo(L, Y(v) + .5); x.lineTo(W - R, Y(v) + .5); x.stroke();
+        x.fillStyle = tok('--muted'); x.textAlign = 'right'; x.fillText(Math.round(v*100) + '%', L - 6, Y(v));
+      }
+      const e = exact();
+      x.strokeStyle = tok('--red'); x.setLineDash([5, 4]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(L, Y(e)); x.lineTo(W - R, Y(e)); x.stroke(); x.setLineDash([]);
+      x.textAlign = 'left'; x.fillStyle = tok('--muted'); x.textBaseline = 'top';
+      x.fillText('0', L, H - B + 6); x.textAlign = 'right'; x.fillText(runs.toLocaleString() + ' runouts', W - R, H - B + 6);
+      if (series.length > 0){
+        const step = Math.max(1, Math.floor(series.length / (iw * 1.5)));
+        x.strokeStyle = tok('--ink'); x.lineWidth = 2; x.lineJoin = 'round'; x.beginPath();
+        for (let i = 0; i < series.length; i += step){
+          const px = L + (series.length === 1 ? iw : iw * i / (series.length - 1));
+          i === 0 ? x.moveTo(px, Y(series[i])) : x.lineTo(px, Y(series[i]));
+        }
+        const last = series[series.length - 1]; x.lineTo(L + iw, Y(last)); x.stroke();
+        x.fillStyle = tok('--ink'); x.beginPath(); x.arc(L + iw, Y(last), 4, 0, Math.PI * 2); x.fill();
+      }
+    }
+    function run(total){
+      if (busy) return;
+      if (total === 1){ showRunout(dealOne()); stats(); draw(); return; }
+      busy = true; w.querySelectorAll('[data-run]').forEach(b => b.disabled = true);
+      const frames = 40, per = Math.ceil(total / frames); let done = 0, last;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const tick = () => {
+        const m = reduce ? total : Math.min(per, total - done);
+        for (let i = 0; i < m; i++) last = dealOne();
+        done += m; stats(); draw();
+        if (done < total) requestAnimationFrame(tick);
+        else { showRunout(last); busy = false; w.querySelectorAll('[data-run]').forEach(b => b.disabled = false); }
+      };
+      requestAnimationFrame(tick);
+    }
+    w.querySelector('.tabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || busy) return; w.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', x === b)); load(b.dataset.k); });
+    w.querySelector('.seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || busy) return; to = +b.dataset.to; w.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); reset(); });
+    w.querySelectorAll('[data-run]').forEach(b => b.addEventListener('click', () => b.dataset.run === 'reset' ? (!busy && reset()) : run(+b.dataset.run)));
+    let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { if (cv.isConnected) draw(); }, 100); });
+    load('flush');
+  }
+
+  /* ---------------- practice drill ---------------- */
+  function makeHand(mode){
+    for (let t = 0; t < 8000; t++){
+      const street = mode === 'mixed' ? (Math.random() < .55 ? 'flop' : 'turn') : mode;
+      const d = shuffle(DECK.slice()), nb = street === 'flop' ? 3 : 4;
+      const hero = d.slice(0,2), board = d.slice(2, 2+nb);
+      const cur = evaluate([...hero, ...board]); if (catOf(cur) >= 4) continue;
+      const outs = outsFor(hero, board); if (outs.length < 3) continue;
+      const P = 20*(3 + rnd(13)), frac = [0.33,0.5,0.66,0.75,1,1.25,1.5][rnd(7)];
+      const B = Math.max(10, Math.round(P*frac/5)*5);
+      return {street, hero, board, outs, cur, P, B};
+    }
+  }
+  function practice(el){
+    el.append(
+      h(`<p class="lead">Random hands, all three steps. Flop hands are all-in shoves, so you see both cards. Turn hands are a normal bet.</p>`)
+    );
+    const ctl = h(`<div class="bar-row" style="justify-content:space-between">
+      <div class="seg" role="group" aria-label="Street"><button data-m="mixed">Mixed</button><button data-m="flop">Flop only</button><button data-m="turn">Turn only</button></div>
+      <button class="linkbtn" id="rs">Reset stats</button></div>`);
+    const stats = h(`<div class="stats"></div>`);
+    const table = h(`<div></div>`), panel = h(`<div class="panel" aria-live="polite"></div>`);
+    el.append(ctl, stats, table, panel);
+    const S = prog.st;
+    const acc = (r,t) => t ? Math.round(100*r/t) + '%' : '–';
+    let prevStats = null;
+    const drawStats = () => {
+      const vals = [S.hands, acc(S.outsR,S.outsT), acc(S.eqR,S.eqT), acc(S.decR,S.decT), S.streak];
+      const names = ['Hands','Outs','Equity','Decisions','Streak'];
+      stats.innerHTML = vals.map((v,i) => `<span>${names[i]} <b class="${prevStats && prevStats[i] !== v ? 'bump' : ''}">${v}</b>${i === 4 ? ` (best ${S.best})` : ''}</span>`).join('');
+      prevStats = vals;
+    };
+    const swap = el => { el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap'); };
+    const drawMode = () => ctl.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === prog.mode));
+    ctl.querySelector('.seg').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; prog.mode = b.dataset.m; save(); drawMode(); deal(); });
+    ctl.querySelector('#rs').addEventListener('click', () => { Object.keys(S).forEach(k => S[k] = 0); save(); drawStats(); });
+    let H, clean;
+    const grade = (k, ok) => { S[k+'T']++; if (ok) S[k+'R']++; else clean = false; save(); drawStats(); };
+
+    function deal(){
+      H = makeHand(prog.mode); clean = true;
+      table.innerHTML = feltHTML(H.hero, H.board, H);
+      stepOuts();
+    }
+    function stepOuts(){
+      panel.innerHTML = `<p class="kicker">Step 1 of 3</p><h3>How many outs to a straight or better?</h3>
+        <form class="bar-row" id="of"><input class="num" id="oi" type="number" inputmode="numeric" min="0" max="30" aria-label="Number of outs" required><button class="btn" type="submit">Check</button></form>
+        <p class="muted" style="font-size:.88rem">You have ${CAT[catOf(H.cur)].toLowerCase()} right now.</p>`;
+      swap(panel);
+      const inp = panel.querySelector('#oi'); inp.focus({preventScroll:true});
+      panel.querySelector('#of').addEventListener('submit', e => {
+        e.preventDefault(); const g = parseInt(inp.value, 10); if (isNaN(g)) return;
+        const n = H.outs.length, ok = g === n; grade('outs', ok);
+        const by = {}; H.outs.forEach(o => { const k = o.cat >= 6 ? 'full house or better' : CAT[o.cat].toLowerCase(); by[k] = (by[k]||0) + 1; });
+        const known = new Set([...H.hero, ...H.board].map(c=>c.id)), os = new Set(H.outs.map(o=>o.c.id));
+        let g2 = `<div class="deck" aria-label="Deck with your outs highlighted"><span></span>`;
+        for (let r = 14; r >= 2; r--) g2 += `<span class="rh">${RL[r]}</span>`;
+        for (const s of SUITS){ g2 += `<span class="sh suit-${s}" style="${s==='s'?'color:var(--ink)':''}">${GLYPH[s]}</span>`;
+          for (let r = 14; r >= 2; r--){ const id = r+s; g2 += `<span class="cell suit-${s} ${known.has(id)?'known':os.has(id)?'out':''}" style="display:grid;place-items:center">${RL[r]}</span>`; } }
+        g2 += `</div>`;
+        panel.innerHTML = `<p class="kicker">Step 1 of 3</p><h3>How many outs to a straight or better?</h3>
+          <div class="fb ${ok?'good':'bad'}"><span class="h">${ok ? `Correct, ${n} outs.` : `You said ${g}. It's ${n}.`}</span>
+          <p>${Object.entries(by).map(([k,v]) => `${v} make a ${k}`).join(', ')}.</p></div>${g2}
+          <div class="bar-row"><button class="btn" id="nx">Next: equity</button></div>`;
+        const b = panel.querySelector('#nx'); b.focus({preventScroll:true}); b.addEventListener('click', stepEq);
+      });
+    }
+    function stepEq(){
+      const n = H.outs.length, flop = H.street === 'flop', m = flop ? 4 : 2, rule = Math.min(99, n*m);
+      const set = new Set([rule]); const sw = Math.min(99, n*(flop?2:4)); if (sw !== rule) set.add(sw);
+      for (const d of [8,-8,15,-15,22]){ if (set.size >= 4) break; const v = rule + d; if (v > 0 && v < 100) set.add(v); }
+      const opts = [...set].sort((a,b)=>a-b);
+      panel.innerHTML = `<p class="kicker">Step 2 of 3</p><h3>Roughly how often do you hit by the river?</h3>
+        <div class="choice">${opts.map(v=>`<button class="opt" data-v="${v}">${v}%</button>`).join('')}</div><div class="out"></div>`;
+      swap(panel);
+      panel.querySelector('.choice').addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b || b.disabled) return;
+        const ok = +b.dataset.v === rule; grade('eq', ok);
+        panel.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (+x.dataset.v === rule) x.classList.add('right'); else if (x === b) x.classList.add('wrong'); });
+        panel.querySelector('.out').replaceWith(h(`<div class="stack"><div class="fb ${ok?'good':'bad'}"><span class="h">${ok?'Right.':`It's about ${rule}%.`}</span>
+          <p class="math">${n} outs × ${m} = ${rule}%  ·  exact ${pct(exactEq(n, H.street))}</p></div>
+          <div class="bar-row"><button class="btn" id="nx">Next: decide</button></div></div>`));
+        const nb = panel.querySelector('#nx'); nb.focus({preventScroll:true}); nb.addEventListener('click', stepDec);
+      });
+    }
+    function stepDec(){
+      const {P, B} = H, flop = H.street === 'flop', eq = exactEq(H.outs.length, H.street), need = B/(P+2*B);
+      const best = eq >= need ? 'call' : 'fold', close = Math.abs(eq-need) < 0.02;
+      panel.innerHTML = `<p class="kicker">Step 3 of 3</p><h3>${flop ? 'All in' : 'A bet'} for $${B} into $${P}. Call or fold?</h3>
+        <div class="choice"><button class="opt word" data-a="call">Call $${B}</button><button class="opt word" data-a="fold">Fold</button></div><div class="out"></div>`;
+      swap(panel);
+      panel.querySelector('.choice').addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b || b.disabled) return;
+        const ok = close || b.dataset.a === best; grade('dec', ok);
+        if (clean){ S.streak++; S.best = Math.max(S.best, S.streak); } else S.streak = 0;
+        S.hands++; save(); drawStats();
+        panel.querySelectorAll('.opt').forEach(x => { x.disabled = true; if (x.dataset.a === best) x.classList.add('right'); else if (x === b && !ok) x.classList.add('wrong'); });
+        panel.querySelector('.out').replaceWith(h(`<div class="stack"><div class="fb ${close?'close':ok?'good':'bad'}">
+          <span class="h">${close ? 'Close spot. Either is fine.' : ok ? `Good ${best}.` : `This is a ${best}.`}</span>
+          <p class="math">needed ${B} ÷ (${P} + ${B} + ${B}) = ${pct(need)}</p>
+          <p class="math">you have ≈ ${pct(eq)}</p></div>
+          <div class="bar-row"><button class="btn red" id="nx">Deal next hand</button></div></div>`));
+        const nb = panel.querySelector('#nx'); nb.focus({preventScroll:true}); nb.addEventListener('click', deal);
+      });
+    }
+    drawMode(); drawStats(); deal();
+  }
+
+  /* ---------------- router ---------------- */
+  const toc = document.getElementById('toc'), main = document.getElementById('lesson');
+  function drawToc(cur){
+    toc.innerHTML = `<li><a href="#home" ${cur === 'home' ? 'aria-current="page"' : ''}><span class="no">·</span><span>Introduction</span></a></li>` +
+      L.map((l,i) => `<li><a href="#${l.id}" class="${prog.done[l.id] ? 'done' : ''}" ${l.id === cur ? 'aria-current="page"' : ''}><span class="no">${i+1}</span><span>${l.title}</span></a></li>`).join('');
+  }
+
+  /* ---------------- home ---------------- */
+  function renderHome(){
+    const hero = parse('Ah Kh'), board = parse('Qh 7h 2c');
+    const lessonsHTML = L.filter(l => l.blurb).map((l,i) => `<li><a href="#${l.id}"><span class="no">${i+1}</span><span><strong>${l.title}</strong><small>${l.blurb}</small></span></a></li>`).join('');
+    main.append(
+      h(`<p class="kicker">A free course on drawing hands</p>`),
+      h(`<h2 class="home-h">Should you chase that draw?</h2>`),
+      h(`<p class="lead">Outs &amp; Odds teaches the one piece of poker math that comes up in almost every hand of Texas Hold'em: deciding whether a draw is worth calling for. Seven short lessons with hands to play through, a drill with unlimited random hands, and a simulator that deals out thousands of runouts.</p>`),
+      h(`<div class="bar-row"><a class="btn red" href="#outs">Start lesson 1</a><a class="btn line" href="#practice">Go straight to practice</a></div>`),
+      h(`<div class="home-ex">${feltHTML(hero, board, {P:80, B:40})}
+        <ol class="method">
+          <li><b>Count your outs</b><span>Nine hearts left in the deck complete your flush.</span><em>9 outs</em></li>
+          <li><b>Turn outs into odds</b><span>The rule of 2: one card to come, so 9 × 2.</span><em>≈ 18%</em></li>
+          <li><b>Compare with the price</b><span>Calling $40 into a final pot of $160.</span><em>need 25%</em></li>
+        </ol>
+        <p class="method-v">18% is less than 25%, so if the bet comes on the turn, this is a fold. You'll learn to run these three steps in a few seconds.</p>
+      </div>`),
+      h(`<div class="stack"><h3>What's inside</h3><ol class="home-list">${lessonsHTML}<li><a href="#practice"><span class="no">→</span><span><strong>Practice</strong><small>Random hands through all three steps, with your accuracy and streak tracked.</small></span></a></li><li><a href="#simulator"><span class="no">→</span><span><strong>Simulator</strong><small>Deal the turn and river thousands of times and watch the hit rate settle on the exact odds.</small></span></a></li><li><a href="#before-you-play"><span class="no">!</span><span><strong>Before you play</strong><small>Casino decks, dirty outs, table rules and playing responsibly.</small></span></a></li></ol></div>`),
+      h(`<div class="faq">
+        <h3>Questions</h3>
+        <details><summary>Is this card counting?</summary><p>Not quite. Card counting is a blackjack technique for tracking which cards have left a shoe of several decks. Poker is dealt from one fresh deck every hand, so the useful kind of counting is counting outs: the cards still in the deck that would make your hand.</p></details>
+        <details><summary>Do casinos use more decks for poker?</summary><p>No. Each hand uses one 52-card deck, reshuffled before the next hand, so the odds here hold at a real table. <a href="#before-you-play">Before you play</a> covers this and the other caveats.</p></details>
+        <details><summary>Do I need to know poker already?</summary><p>You should know the hand rankings and how a hand of Hold'em is dealt (two hole cards, then the flop, turn and river). Everything else is explained as you go.</p></details>
+        <details><summary>How accurate are the numbers?</summary><p>The exact percentages are computed from the cards you can't see: 47 on the flop and 46 on the turn. They assume every out wins, which the course points out where it matters.</p></details>
+        <details><summary>Does it save my progress?</summary><p>Yes, in this browser only. Finished lessons get a tick in the contents and your practice stats stay until you reset them.</p></details>
+      </div>`)
+    );
+  }
+
+  const LESSONS = L.filter(l => l.blurb).length;
+  function route(){
+    const id = location.hash.slice(1);
+    main.innerHTML = '';
+    const idx = L.findIndex(l => l.id === id);
+    if (idx < 0){
+      renderHome();
+      drawToc('home');
+    } else {
+      const i = idx, l = L[i];
+      main.append(h(`<p class="kicker">${l.id === 'practice' ? 'Drill' : l.id === 'simulator' ? 'Tool' : l.id === 'before-you-play' ? 'Read this' : `Lesson ${i+1} of ${LESSONS}`}</p>`), h(`<h2>${l.title}</h2>`));
+      l.render(main);
+      const prev = i > 0 ? L[i-1] : {id:'home', title:'Introduction'}, next = L[i+1];
+      main.append(h(`<nav class="pager" aria-label="Lesson navigation">
+        <a href="#${prev.id}"><small>← Previous</small><span>${prev.title}</span></a>
+        ${next ? `<a class="nx" href="#${next.id}"><small>Next →</small><span>${next.title}</span></a>` : ''}
+      </nav>`));
+      const nx = main.querySelector('.pager .nx');
+      if (nx) nx.addEventListener('click', () => { prog.done[l.id] = 1; save(); });
+      drawToc(l.id);
+    }
+    [...main.children].forEach((c, k) => { c.style.setProperty('--i', Math.min(k, 8)); c.classList.add('enter'); });
+    window.scrollTo({top:0});
+  }
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
+</body>
+</html>
